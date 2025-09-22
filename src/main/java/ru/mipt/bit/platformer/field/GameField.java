@@ -46,11 +46,6 @@ public class GameField {
     }
 
     public boolean isPositionTaken(GridPoint2 position) {
-        for (RenderableEntity entity: renderableEntities) {
-            if (position.equals(entity.getPosition())) {
-                return true;
-            };
-        }
-        return false;
+        return renderableEntities.stream().anyMatch(entity -> position.equals(entity.getPosition()));
     }
 }
