@@ -32,7 +32,7 @@ public class RenderBehavior {
     }
 
     public GridPoint2 getPosition() {
-        return new GridPoint2(position);    // returned type is passed with a reference; hence one can unintentionally change the returned value, so we create a new one
+        return position.cpy();    // returned type is passed with a reference; hence one can unintentionally change the returned value, so we copy it
     }
 
     public Rectangle getRectangle() {
@@ -41,5 +41,9 @@ public class RenderBehavior {
 
     public void setRotation(float rotation) {
         rotateBehavior.setRotation(rotation);
+    }
+
+    public float getRotation() {
+        return rotateBehavior.getRotation();
     }
 }

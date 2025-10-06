@@ -51,4 +51,20 @@ public class MoveBehavior {
             movementProgress = 0f;
         }
     }
+
+    public float getRotation() {
+        return renderBehavior.getRotation();
+    }
+
+    public GridPoint2 getPosition() {
+        return renderBehavior.getPosition();
+    }
+
+    public void setDestinationPosition(GridPoint2 desinationPosition) {
+        this.destinationPosition = desinationPosition;
+    }
+
+    public GridPoint2 getDestinationPosition() {
+        return destinationPosition.cpy();
+    }
 }

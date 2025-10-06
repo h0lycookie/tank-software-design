@@ -28,9 +28,6 @@ import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 public class GameDesktopLauncher implements ApplicationListener {
-
-    private static final float MOVEMENT_SPEED = 0.4f;
-
     private Batch batch;
 
     private TiledMap level;
@@ -51,7 +48,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         gameField = new GameField(levelRenderer);
 
-        
+        final float MOVEMENT_SPEED = 0.4f;
         RenderBehavior tankRenderBehavior = new RenderBehavior(new GridPoint2(1, 1), new TextureRegion(new Texture("images/tank_blue.png")), groundLayer, new RotateBehavior(0f));
         Tank tank = new Tank(tankRenderBehavior, new MoveBehavior(MOVEMENT_SPEED, true, tileMovement, tankRenderBehavior));
         gameField.addMovableEntity(tank);
@@ -69,7 +66,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         controlHandler.handleControlInput();
 
-        gameField.updateEntities(Gdx.graphics.getDeltaTime());
+        gameField.moveEntities(Gdx.graphics.getDeltaTime());
 
         gameField.renderLevel();
 

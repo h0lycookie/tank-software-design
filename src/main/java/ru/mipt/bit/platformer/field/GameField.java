@@ -12,17 +12,17 @@ import ru.mipt.bit.platformer.entity.MovableEntity;
 
 public class GameField {
     private final MapRenderer levelRenderer;
-    private final Collection<MovableEntity> updatableEntities;
+    private final Collection<MovableEntity> movableEntities;
     private final Collection<RenderableEntity> renderableEntities;
 
     public GameField(MapRenderer levelRenderer) {
         this.levelRenderer = levelRenderer;
-        this.updatableEntities = new ArrayList<>();
+        this.movableEntities = new ArrayList<>();
         this.renderableEntities = new ArrayList<>();
     }
 
     public void addMovableEntity(MovableEntity entity) {
-        updatableEntities.add(entity);
+        movableEntities.add(entity);
     }
 
     public void addRenderableEntity(RenderableEntity entity) {
@@ -39,13 +39,21 @@ public class GameField {
         }
     }
 
-    public void updateEntities(float deltaTime) {
-        for (MovableEntity entity: updatableEntities) {
+    public void moveEntities(float deltaTime) {
+        for (MovableEntity entity: movableEntities) {
             entity.move(deltaTime);
         }
     }
 
     public boolean isPositionTaken(GridPoint2 position) {
         return renderableEntities.stream().anyMatch(entity -> position.equals(entity.getPosition()));
+    }
+
+    public Collection<MovableEntity> getMovableEntities() {
+        return movableEntities;
+    }
+
+    public Collection<RenderableEntity> getRenderableEntities() {
+        return renderableEntities;
     }
 }
