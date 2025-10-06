@@ -1,11 +1,22 @@
 package ru.mipt.bit.platformer.entity;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
 
-public class Tree extends RenderableEntity {
-    public Tree(GridPoint2 position, TextureRegion sprite, TiledMapTileLayer groundLayer) {
-        super(position, 0f, sprite, groundLayer);
+public class Tree implements RenderableEntity {
+    RenderBehavior renderBehavior;
+
+    public Tree(RenderBehavior renderBehavior) {
+        this.renderBehavior = renderBehavior;
+    }
+
+    @Override
+    public void render(Batch batch) {
+        renderBehavior.render(batch);
+    }
+
+    @Override
+    public GridPoint2 getPosition() {
+        return renderBehavior.getPosition();
     }
 };

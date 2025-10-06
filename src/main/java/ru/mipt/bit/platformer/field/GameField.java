@@ -8,11 +8,11 @@ import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.entity.RenderableEntity;
-import ru.mipt.bit.platformer.entity.UpdatableEntity;
+import ru.mipt.bit.platformer.entity.MovableEntity;
 
 public class GameField {
     private final MapRenderer levelRenderer;
-    private final Collection<UpdatableEntity> updatableEntities;
+    private final Collection<MovableEntity> updatableEntities;
     private final Collection<RenderableEntity> renderableEntities;
 
     public GameField(MapRenderer levelRenderer) {
@@ -21,7 +21,7 @@ public class GameField {
         this.renderableEntities = new ArrayList<>();
     }
 
-    public void addUpdatableEntity(UpdatableEntity entity) {
+    public void addMovableEntity(MovableEntity entity) {
         updatableEntities.add(entity);
     }
 
@@ -40,8 +40,8 @@ public class GameField {
     }
 
     public void updateEntities(float deltaTime) {
-        for (UpdatableEntity entity: updatableEntities) {
-            entity.update(deltaTime);
+        for (MovableEntity entity: updatableEntities) {
+            entity.move(deltaTime);
         }
     }
 

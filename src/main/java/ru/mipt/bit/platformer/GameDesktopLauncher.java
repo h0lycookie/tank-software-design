@@ -16,8 +16,11 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Interpolation;
 
 import ru.mipt.bit.platformer.util.TileMovement;
+import ru.mipt.bit.platformer.entity.RenderBehavior;
+import ru.mipt.bit.platformer.entity.RotateBehavior;
 import ru.mipt.bit.platformer.entity.Tank;
 import ru.mipt.bit.platformer.entity.Tree;
+import ru.mipt.bit.platformer.entity.UpdateBehavior;
 import ru.mipt.bit.platformer.field.GameField;
 import ru.mipt.bit.platformer.util.ControlHandler;
 
@@ -48,11 +51,14 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         gameField = new GameField(levelRenderer);
 
-        Tank tank = new Tank(new GridPoint2(1, 1), MOVEMENT_SPEED, new TextureRegion(new Texture("images/tank_blue.png")), groundLayer, tileMovement);
-        gameField.addUpdatableEntity(tank);
+        
+        RenderBehavior tankRenderBehavior = new RenderBehavior(new GridPoint2(1, 1), new TextureRegion(new Texture("images/tank_blue.png")), groundLayer, new RotateBehavior(0f));
+        Tank tank = new Tank(tankRenderBehavior, new UpdateBehavior(MOVEMENT_SPEED, true, tileMovement, tankRenderBehavior));
+        gameField.addMovableEntity(tank);
         gameField.addRenderableEntity(tank);
 
-        gameField.addRenderableEntity(new Tree(new GridPoint2(1, 3), new TextureRegion(new Texture("images/greenTree.png")), groundLayer));
+        RenderBehavior treeRenderBehavior = new RenderBehavior(new GridPoint2(1, 3), new TextureRegion(new Texture("images/greenTree.png")), groundLayer, new RotateBehavior(0f));
+        gameField.addRenderableEntity(new Tree(treeRenderBehavior));
 
         controlHandler = new ControlHandler(tank, gameField);
     }
