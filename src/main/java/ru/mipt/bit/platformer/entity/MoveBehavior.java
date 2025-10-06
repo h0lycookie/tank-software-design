@@ -9,7 +9,7 @@ import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 import ru.mipt.bit.platformer.util.TileMovement;
 
-public class UpdateBehavior {
+public class MoveBehavior {
     private RenderBehavior renderBehavior;
 
     private GridPoint2 destinationPosition;
@@ -20,7 +20,7 @@ public class UpdateBehavior {
 
     private TileMovement tileMovement;
 
-    public UpdateBehavior(float movementSpeed, boolean isFocused, TileMovement tileMovement, RenderBehavior renderBehavior) {
+    public MoveBehavior(float movementSpeed, boolean isFocused, TileMovement tileMovement, RenderBehavior renderBehavior) {
         this.movementSpeed = movementSpeed;
         this.isFocused = isFocused;
         this.tileMovement = tileMovement;
