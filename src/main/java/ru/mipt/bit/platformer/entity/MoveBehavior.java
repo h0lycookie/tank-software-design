@@ -7,64 +7,63 @@ import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.field.GameField;
 import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
-import ru.mipt.bit.platformer.util.TileMovement;
 
 public class MoveBehavior {
-    private RenderBehavior renderBehavior;
+    private static final float MAX_MOVEMENT_PROGRESS = 1f;
+    private static final float MIN_MOVEMENT_PROGRESS = 0f;
 
+    private GridPoint2 position;
     private GridPoint2 destinationPosition;
+    private float rotation;
     private float movementSpeed;
-    private float movementProgress = 1f;
+    private float movementProgress = MAX_MOVEMENT_PROGRESS;
 
-    private boolean isFocused = false;
-
-    private TileMovement tileMovement;
-
-    public MoveBehavior(float movementSpeed, boolean isFocused, TileMovement tileMovement, RenderBehavior renderBehavior) {
+    public MoveBehavior(GridPoint2 position, float movementSpeed, float rotation) {
+        this.position = position.cpy();
+        this.destinationPosition = position.cpy();
+        this.rotation = rotation;
         this.movementSpeed = movementSpeed;
-        this.isFocused = isFocused;
-        this.tileMovement = tileMovement;
-        this.renderBehavior = renderBehavior;
-        this.destinationPosition = renderBehavior.getPosition();
     }
 
     public void move(float deltaTime) {
         movementProgress = GdxGameUtils.continueProgress(movementProgress, deltaTime, movementSpeed);
-        if (isFocused) {
-            tileMovement.moveRectangleBetweenTileCenters(renderBehavior.getRectangle(), renderBehavior.getPosition(), destinationPosition, movementProgress);
+        if (finishedMoving()) {
+            position.set(destinationPosition);
         }
-
-        if (isEqual(movementProgress, 1f)) {
-            renderBehavior.setPosition(destinationPosition);
-        }
-    }
-
-    public boolean hasMoved() {
-        return isEqual(movementProgress, 1f);
-    }
+    }   
     
     public void prepareMovement(Direction direction, GameField gameField) {
-        renderBehavior.setRotation(direction.getRotation());
-        GridPoint2 newPosition = direction.getNewPosition(renderBehavior.getPosition());
-        if (!gameField.isPositionTaken(newPosition)) {
-            destinationPosition.set(newPosition);
-            movementProgress = 0f;
+        if (finishedMoving()) {
+            GridPoint2 newPosition = direction.getNewPosition(position);
+            rotation = direction.getRotation();
+            if (!gameField.isPositionTaken(newPosition)) {
+                destinationPosition.set(newPosition);
+                movementProgress = MIN_MOVEMENT_PROGRESS;
+            }
         }
-    }
-
-    public float getRotation() {
-        return renderBehavior.getRotation();
-    }
-
-    public GridPoint2 getPosition() {
-        return renderBehavior.getPosition();
     }
 
     public void setDestinationPosition(GridPoint2 desinationPosition) {
-        this.destinationPosition = desinationPosition;
+        this.destinationPosition = desinationPosition.cpy();
     }
 
     public GridPoint2 getDestinationPosition() {
         return destinationPosition.cpy();
+    }
+
+    public GridPoint2 getPosition() {
+        return position.cpy();
+    }
+
+    public float getRotation() {
+        return rotation;
+    }
+
+    public float getMovementProgress() {
+        return movementProgress;
+    }
+
+    private boolean finishedMoving() {
+        return isEqual(movementProgress, MAX_MOVEMENT_PROGRESS);
     }
 }

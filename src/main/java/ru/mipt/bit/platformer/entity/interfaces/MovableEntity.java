@@ -1,12 +1,9 @@
-package ru.mipt.bit.platformer.entity;
+package ru.mipt.bit.platformer.entity.interfaces;
 
 import ru.mipt.bit.platformer.field.GameField;
 import ru.mipt.bit.platformer.util.Direction;
 
-public interface MovableEntity {
+public interface MovableEntity extends Entity {
     public void move(float deltaTime);
-
-    public boolean hasMoved();
-
     public void prepareMovement(Direction direction, GameField gameField);
 }

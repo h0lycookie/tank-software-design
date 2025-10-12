@@ -5,10 +5,11 @@ import java.util.Collection;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.MapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.entity.RenderableEntity;
-import ru.mipt.bit.platformer.entity.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 
 public class GameField {
     private final MapRenderer levelRenderer;
@@ -33,9 +34,9 @@ public class GameField {
         levelRenderer.render();
     }
 
-    public void renderEntities(Batch batch) {
+    public void renderEntities(Batch batch, TiledMapTileLayer layer) {
         for (RenderableEntity entity: renderableEntities) {
-            entity.render(batch);
+            entity.render(batch, layer);
         }
     }
 

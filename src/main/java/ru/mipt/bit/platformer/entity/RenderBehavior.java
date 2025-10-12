@@ -9,41 +9,28 @@ import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 
 public class RenderBehavior {
-    private GridPoint2 position;
     private Rectangle rectangle;
     private TextureRegion sprite;
-    private RotateBehavior rotateBehavior;
 
-    public RenderBehavior(GridPoint2 position, TextureRegion sprite, TiledMapTileLayer groundLayer, RotateBehavior rotateBehavior) {
-        this.position = position;
+    public RenderBehavior(TextureRegion sprite) {
         this.rectangle = GdxGameUtils.createBoundingRectangle(sprite);
         this.sprite = sprite;
-        this.rotateBehavior = rotateBehavior;
-
-        GdxGameUtils.moveRectangleAtTileCenter(groundLayer, rectangle, position);   
     }
 
-    public void render(Batch batch) {
-        GdxGameUtils.drawTextureRegionUnscaled(batch, sprite, rectangle, rotateBehavior.getRotation());
+    public void render(Batch batch, TiledMapTileLayer layer, GridPoint2 position) {
+        GdxGameUtils.moveRectangleAtTileCenter(layer, rectangle, position);
+        GdxGameUtils.drawTextureRegionUnscaled(batch, sprite, rectangle, 0f);
     }
 
-    public void setPosition(GridPoint2 position) {
-        this.position.set(position);
-    }
-
-    public GridPoint2 getPosition() {
-        return position.cpy();    // returned type is passed with a reference; hence one can unintentionally change the returned value, so we copy it
+    public void setRectangle(Rectangle rectangle) {
+        this.rectangle = new Rectangle(rectangle);
     }
 
     public Rectangle getRectangle() {
-        return rectangle;
+        return new Rectangle(rectangle);
     }
 
-    public void setRotation(float rotation) {
-        rotateBehavior.setRotation(rotation);
-    }
-
-    public float getRotation() {
-        return rotateBehavior.getRotation();
+    public TextureRegion getSprite() {
+        return new TextureRegion(sprite);
     }
 }
