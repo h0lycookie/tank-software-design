@@ -8,22 +8,15 @@ import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 
-public class GameField {
+public class Renderer {
     private final MapRenderer levelRenderer;
-    private final Collection<MovableEntity> movableEntities;
     private final Collection<RenderableEntity> renderableEntities;
 
-    public GameField(MapRenderer levelRenderer) {
+    public Renderer(MapRenderer levelRenderer) {
         this.levelRenderer = levelRenderer;
-        this.movableEntities = new ArrayList<>();
         this.renderableEntities = new ArrayList<>();
-    }
-
-    public void addMovableEntity(MovableEntity entity) {
-        movableEntities.add(entity);
     }
 
     public void addRenderableEntity(RenderableEntity entity) {
@@ -40,18 +33,8 @@ public class GameField {
         }
     }
 
-    public void moveEntities(float deltaTime) {
-        for (MovableEntity entity: movableEntities) {
-            entity.move(deltaTime);
-        }
-    }
-
     public boolean isPositionTaken(GridPoint2 position) {
         return renderableEntities.stream().anyMatch(entity -> position.equals(entity.getPosition()));
-    }
-
-    public Collection<MovableEntity> getMovableEntities() {
-        return movableEntities;
     }
 
     public Collection<RenderableEntity> getRenderableEntities() {
