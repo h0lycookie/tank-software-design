@@ -4,7 +4,7 @@ import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.field.GameField;
+import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 
@@ -32,11 +32,11 @@ public class MoveBehavior {
         }
     }   
     
-    public void prepareMovement(Direction direction, GameField gameField) {
+    public void prepareMovement(Direction direction, Renderer renderer) {
         if (finishedMoving()) {
             GridPoint2 newPosition = direction.getNewPosition(position);
             rotation = direction.getRotation();
-            if (!gameField.isPositionTaken(newPosition)) {
+            if (!renderer.isPositionTaken(newPosition)) {
                 destinationPosition.set(newPosition);
                 movementProgress = MIN_MOVEMENT_PROGRESS;
             }

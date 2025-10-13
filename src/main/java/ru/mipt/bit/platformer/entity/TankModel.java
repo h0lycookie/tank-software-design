@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
 import ru.mipt.bit.platformer.field.GameField;
+import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.Direction;
 
 public class TankModel implements MovableEntity {
@@ -19,8 +20,8 @@ public class TankModel implements MovableEntity {
     }
 
     @Override
-    public void prepareMovement(Direction direction, GameField gameField) {
-        moveBehavior.prepareMovement(direction, gameField);
+    public void prepareMovement(Direction direction, Renderer renderer) {
+        moveBehavior.prepareMovement(direction, renderer);
     }
 
     @Override
