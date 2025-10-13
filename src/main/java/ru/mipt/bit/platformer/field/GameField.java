@@ -5,24 +5,25 @@ import java.util.Collection;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.MapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.entity.RenderableEntity;
-import ru.mipt.bit.platformer.entity.UpdatableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 
 public class GameField {
     private final MapRenderer levelRenderer;
-    private final Collection<UpdatableEntity> updatableEntities;
+    private final Collection<MovableEntity> movableEntities;
     private final Collection<RenderableEntity> renderableEntities;
 
     public GameField(MapRenderer levelRenderer) {
         this.levelRenderer = levelRenderer;
-        this.updatableEntities = new ArrayList<>();
+        this.movableEntities = new ArrayList<>();
         this.renderableEntities = new ArrayList<>();
     }
 
-    public void addUpdatableEntity(UpdatableEntity entity) {
-        updatableEntities.add(entity);
+    public void addMovableEntity(MovableEntity entity) {
+        movableEntities.add(entity);
     }
 
     public void addRenderableEntity(RenderableEntity entity) {
@@ -33,19 +34,27 @@ public class GameField {
         levelRenderer.render();
     }
 
-    public void renderEntities(Batch batch) {
+    public void renderEntities(Batch batch, TiledMapTileLayer layer) {
         for (RenderableEntity entity: renderableEntities) {
-            entity.render(batch);
+            entity.render(batch, layer);
         }
     }
 
-    public void updateEntities(float deltaTime) {
-        for (UpdatableEntity entity: updatableEntities) {
-            entity.update(deltaTime);
+    public void moveEntities(float deltaTime) {
+        for (MovableEntity entity: movableEntities) {
+            entity.move(deltaTime);
         }
     }
 
     public boolean isPositionTaken(GridPoint2 position) {
         return renderableEntities.stream().anyMatch(entity -> position.equals(entity.getPosition()));
+    }
+
+    public Collection<MovableEntity> getMovableEntities() {
+        return movableEntities;
+    }
+
+    public Collection<RenderableEntity> getRenderableEntities() {
+        return renderableEntities;
     }
 }
