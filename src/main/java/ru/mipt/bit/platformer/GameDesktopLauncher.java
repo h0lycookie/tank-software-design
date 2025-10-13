@@ -23,7 +23,6 @@ import ru.mipt.bit.platformer.entity.TankModel;
 import ru.mipt.bit.platformer.entity.TreeGraphics;
 import ru.mipt.bit.platformer.entity.TreeModel;
 import ru.mipt.bit.platformer.entity.MoveBehavior;
-import ru.mipt.bit.platformer.field.GameField;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.ControlHandler;
@@ -64,6 +63,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, new TreeModel(new GridPoint2(1, 3))));
 
         controlHandler = new ControlHandler(tankModel, renderer);
+        // actually, I already have connections between program parts via interfaces, so just did some refactoring required
     }
 
     @Override
