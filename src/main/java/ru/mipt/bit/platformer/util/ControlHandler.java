@@ -1,7 +1,6 @@
 package ru.mipt.bit.platformer.util;
 
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
-import ru.mipt.bit.platformer.field.GameField;
 import ru.mipt.bit.platformer.field.Renderer;
 
 public class ControlHandler {

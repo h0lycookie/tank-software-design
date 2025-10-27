@@ -3,7 +3,6 @@ package ru.mipt.bit.platformer.entity;
 import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
-import ru.mipt.bit.platformer.field.GameField;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.Direction;
 
