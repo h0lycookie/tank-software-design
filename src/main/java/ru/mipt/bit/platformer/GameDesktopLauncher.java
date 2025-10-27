@@ -25,10 +25,15 @@ import ru.mipt.bit.platformer.entity.TreeModel;
 import ru.mipt.bit.platformer.entity.MoveBehavior;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
+import ru.mipt.bit.platformer.level.LevelGenerator;
+import ru.mipt.bit.platformer.level.LevelGenerator.LevelData;
+import ru.mipt.bit.platformer.level.LevelGeneratorRandom;
 import ru.mipt.bit.platformer.util.ControlHandler;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
+
+import java.io.IOException;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private Batch batch;
@@ -39,6 +44,8 @@ public class GameDesktopLauncher implements ApplicationListener {
     private Mover mover;
     private Renderer renderer;
     private ControlHandler controlHandler;
+
+    private static String levelFilePath = "./src/main/resources/level_design.txt";
 
     @Override
     public void create() {
@@ -51,19 +58,28 @@ public class GameDesktopLauncher implements ApplicationListener {
         mover = new Mover();
         renderer = new Renderer(createSingleLayerMapRenderer(level, batch));
 
-        final float MOVEMENT_SPEED = 0.4f;
-        GridPoint2 tankPosition = new GridPoint2(1, 1);
-        MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, MOVEMENT_SPEED, 0f);
-        TankModel tankModel = new TankModel(tankMoveBehavior);
-        TankGraphics tankGraphics = new TankGraphics(new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement), tankModel);
-        mover.addMovableEntity(tankModel);
-        renderer.addRenderableEntity(tankGraphics);
+        LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), 3);
+        LevelData levelObjectsPositions;
+        try {
+            levelObjectsPositions = levelGenerator.generateLevel();
+            final float MOVEMENT_SPEED = 0.4f;
+            GridPoint2 tankPosition = levelObjectsPositions.getPlayerPosition();
+            MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, MOVEMENT_SPEED, 0f);
+            TankModel tankModel = new TankModel(tankMoveBehavior);
+            TankGraphics tankGraphics = new TankGraphics(new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement), tankModel);
+            mover.addMovableEntity(tankModel);
+            renderer.addRenderableEntity(tankGraphics);
+            
+            for (GridPoint2 treePosition: levelObjectsPositions.getTreePositions()) {
+                 RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
+                renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, new TreeModel(treePosition)));
+            }
 
-        RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
-        renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, new TreeModel(new GridPoint2(1, 3))));
-
-        controlHandler = new ControlHandler(tankModel, renderer);
-        // actually, I already have connections between program parts via interfaces, so just did some refactoring required
+            controlHandler = new ControlHandler(tankModel, renderer);
+        } catch (IOException e) {
+           System.out.printf("caught exception %s, returning...\n", e.getMessage());
+           return;
+        }
     }
 
     @Override
