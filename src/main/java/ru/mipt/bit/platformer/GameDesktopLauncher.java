@@ -58,11 +58,13 @@ public class GameDesktopLauncher implements ApplicationListener {
         mover = new Mover();
         renderer = new Renderer(createSingleLayerMapRenderer(level, batch));
 
-        LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), 3);
+        final int TREE_COUNT = 3;
+        LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), TREE_COUNT);
         LevelData levelObjectsPositions;
         try {
-            levelObjectsPositions = levelGenerator.generateLevel();
             final float MOVEMENT_SPEED = 0.4f;
+
+            levelObjectsPositions = levelGenerator.generateLevel();
             GridPoint2 tankPosition = levelObjectsPositions.getPlayerPosition();
             MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, MOVEMENT_SPEED, 0f);
             TankModel tankModel = new TankModel(tankMoveBehavior);
