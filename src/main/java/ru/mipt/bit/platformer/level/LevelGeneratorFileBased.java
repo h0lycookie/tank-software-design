@@ -38,6 +38,7 @@ public class LevelGeneratorFileBased extends LevelGenerator {
         }
 
         Collection<GridPoint2> treePositions = new ArrayList<>();
+        Collection<GridPoint2> aiTankPositions = new ArrayList<>();
         GridPoint2 playerPosition = null;
 
         for (int y = 0; y < fileHeight; ++y) {
@@ -50,11 +51,14 @@ public class LevelGeneratorFileBased extends LevelGenerator {
                     case 'T':
                         treePositions.add(position);
                         break;
-                    case 'X':
+                    case 'P':
                         if (playerPosition != null) {
                             throw new IllegalArgumentException("discovered multiple players positions");
                         }
                         playerPosition = position;
+                        break;
+                    case 'X':
+                        aiTankPositions.add(position);
                         break;
                     case '_':
                         break;
@@ -68,6 +72,6 @@ public class LevelGeneratorFileBased extends LevelGenerator {
             throw new IllegalArgumentException("No player position in file with level design");
         }
 
-        return new LevelData(playerPosition, treePositions);
+        return new LevelData(playerPosition, treePositions, aiTankPositions);
     }
 }

@@ -28,12 +28,16 @@ import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.level.LevelGenerator;
 import ru.mipt.bit.platformer.level.LevelGenerator.LevelData;
 import ru.mipt.bit.platformer.level.LevelGeneratorRandom;
+import ru.mipt.bit.platformer.util.AIControlHandler;
 import ru.mipt.bit.platformer.util.ControlHandler;
+import ru.mipt.bit.platformer.util.TankCommand;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private Batch batch;
@@ -44,6 +48,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     private Mover mover;
     private Renderer renderer;
     private ControlHandler controlHandler;
+    private AIControlHandler aiControlHandler;
 
     private static String levelFilePath = "./src/main/resources/level_design.txt";
 
@@ -59,25 +64,29 @@ public class GameDesktopLauncher implements ApplicationListener {
         renderer = new Renderer(createSingleLayerMapRenderer(level, batch));
 
         final int TREE_COUNT = 3;
-        LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), TREE_COUNT);
+        final int TANKS_COUNT = 3;
+        LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), TREE_COUNT, TANKS_COUNT);
         LevelData levelObjectsPositions;
+        List<TankModel> aiTanks = new ArrayList<>();
         try {
+            levelObjectsPositions = levelGenerator.generateLevel();
+
             final float MOVEMENT_SPEED = 0.4f;
 
-            levelObjectsPositions = levelGenerator.generateLevel();
-            GridPoint2 tankPosition = levelObjectsPositions.getPlayerPosition();
-            MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, MOVEMENT_SPEED, 0f);
-            TankModel tankModel = new TankModel(tankMoveBehavior);
-            TankGraphics tankGraphics = new TankGraphics(new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement), tankModel);
-            mover.addMovableEntity(tankModel);
-            renderer.addRenderableEntity(tankGraphics);
+            GridPoint2 playerTankPosition = levelObjectsPositions.getPlayerPosition();
+            MoveBehavior playerTankMoveBehavior = new MoveBehavior(playerTankPosition, MOVEMENT_SPEED, 0f);
+            TankModel playerTankModel = new TankModel(playerTankMoveBehavior);
+            TankGraphics playerTankGraphics = new TankGraphics(new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement), playerTankModel);
+            mover.addMovableEntity(playerTankModel);
+            renderer.addRenderableEntity(playerTankGraphics);
             
             for (GridPoint2 treePosition: levelObjectsPositions.getTreePositions()) {
                  RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
                 renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, new TreeModel(treePosition)));
             }
 
-            controlHandler = new ControlHandler(tankModel, renderer);
+            controlHandler = new ControlHandler(playerTankModel, renderer);
+            aiControlHandler = new AIControlHandler(TankCommand.create(aiTanks));
         } catch (IOException e) {
            System.out.printf("caught exception %s, returning...\n", e.getMessage());
            return;
@@ -126,6 +135,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     private void processActions() {
         controlHandler.handleControlInput();
+        aiControlHandler.handle();
         mover.moveEntities(Gdx.graphics.getDeltaTime());
     }
     

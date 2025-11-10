@@ -20,10 +20,12 @@ public abstract class LevelGenerator {
     public static class LevelData {
         private final GridPoint2 playerPosition;
         private final Collection<GridPoint2> treePositions;
+        private final Collection<GridPoint2> tankPositions;
 
-        public LevelData(GridPoint2 playerPosition, Collection<GridPoint2> treePositions) {
+        public LevelData(GridPoint2 playerPosition, Collection<GridPoint2> treePositions, Collection<GridPoint2> tankPositions) {
             this.playerPosition = playerPosition;
             this.treePositions = new ArrayList<>(treePositions);
+            this.tankPositions = new ArrayList<>(tankPositions);
         }
 
         public GridPoint2 getPlayerPosition() {
@@ -32,6 +34,10 @@ public abstract class LevelGenerator {
 
         public Collection<GridPoint2> getTreePositions() {
             return new ArrayList<>(treePositions);
+        }
+
+        public Collection<GridPoint2> getTankPositions() {
+            return new ArrayList<>(tankPositions);
         }
     }
 }
