@@ -2,17 +2,25 @@ package ru.mipt.bit.platformer.entity;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.entity.interfaces.HealthableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.Direction;
 
-public class TankModel implements MovableEntity, HealthableEntity {
+public class HealthBarModel implements MovableEntity {
     private MoveBehavior moveBehavior;
-    private float health;
+    private boolean visible;
 
-    public TankModel(MoveBehavior moveBehavior) {
+    public HealthBarModel(MoveBehavior moveBehavior, boolean visible) {
         this.moveBehavior = moveBehavior;
+        this.visible = visible;
+    }
+
+    public boolean getVisible() {
+        return visible;
+    }
+
+    public void switchVisibility() {
+        visible = !visible;
     }
 
     @Override
@@ -32,18 +40,12 @@ public class TankModel implements MovableEntity, HealthableEntity {
 
     @Override
     public float getHealth() {
-        return health;
+        return 100;
     }
 
+    @Override
     public GridPoint2 getDestinationPosition() {
-        return moveBehavior.getDestinationPosition();
+        
     }
-
-    public float getRotation() {
-        return moveBehavior.getRotation();
-    }
-
-    public float getMovementProgress() {
-        return moveBehavior.getMovementProgress();
-    }
+        healthBarModel.getRotation(), healthBarModel.getMovementProgress()
 }

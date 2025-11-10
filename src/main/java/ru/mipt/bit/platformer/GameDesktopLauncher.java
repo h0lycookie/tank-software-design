@@ -22,6 +22,8 @@ import ru.mipt.bit.platformer.entity.TankGraphics;
 import ru.mipt.bit.platformer.entity.TankModel;
 import ru.mipt.bit.platformer.entity.TreeGraphics;
 import ru.mipt.bit.platformer.entity.TreeModel;
+import ru.mipt.bit.platformer.entity.HealthBarDecorator;
+import ru.mipt.bit.platformer.entity.HealthBarModel;
 import ru.mipt.bit.platformer.entity.MoveBehavior;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
@@ -76,9 +78,11 @@ public class GameDesktopLauncher implements ApplicationListener {
             GridPoint2 playerTankPosition = levelObjectsPositions.getPlayerPosition();
             MoveBehavior playerTankMoveBehavior = new MoveBehavior(playerTankPosition, MOVEMENT_SPEED, 0f);
             TankModel playerTankModel = new TankModel(playerTankMoveBehavior);
-            TankGraphics playerTankGraphics = new TankGraphics(new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement), playerTankModel);
-            mover.addMovableEntity(playerTankModel);
-            renderer.addRenderableEntity(playerTankGraphics);
+            MovingRenderBehavior playerTankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
+            TankGraphics playerTankGraphics = new TankGraphics(playerTankMovingRenderBehavior, playerTankModel);
+            HealthBarModel playerTankHealthBarModel = new HealthBarModel(playerTankMoveBehavior, true);
+            mover.addMovableEntity(new HealthBarModel(playerTankMoveBehavior, true));
+            renderer.addRenderableEntity(new HealthBarDecorator(playerTankMovingRenderBehavior, playerTankHealthBarModel));
             
             for (GridPoint2 treePosition: levelObjectsPositions.getTreePositions()) {
                  RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
