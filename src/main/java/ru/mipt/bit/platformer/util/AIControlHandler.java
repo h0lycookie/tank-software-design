@@ -12,7 +12,7 @@ public class AIControlHandler {
         this.commands = commands;
     }
 
-    public void control() {
+    public void handle() {
         for (var commandsForAI : commands) {
             int action = ThreadLocalRandom.current().nextInt(commands.size());
             var command = commandsForAI.get(action);
