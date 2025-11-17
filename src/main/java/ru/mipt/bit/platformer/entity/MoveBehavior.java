@@ -4,7 +4,6 @@ import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 
@@ -17,12 +16,14 @@ public class MoveBehavior {
     private float rotation;
     private float movementSpeed;
     private float movementProgress = MAX_MOVEMENT_PROGRESS;
+    private final MapModel mapModel;
 
-    public MoveBehavior(GridPoint2 position, float movementSpeed, float rotation) {
+    public MoveBehavior(GridPoint2 position, float movementSpeed, float rotation, MapModel mapModel) {
         this.position = position.cpy();
         this.destinationPosition = position.cpy();
         this.rotation = rotation;
         this.movementSpeed = movementSpeed;
+        this.mapModel = mapModel;
     }
 
     public void move(float deltaTime) {
@@ -32,11 +33,11 @@ public class MoveBehavior {
         }
     }   
     
-    public void prepareMovement(Direction direction, Renderer renderer) {
+    public void prepareMovement(Direction direction) {
         if (finishedMoving()) {
             GridPoint2 newPosition = direction.getNewPosition(position);
             rotation = direction.getRotation();
-            if (!renderer.isPositionTaken(newPosition)) {
+            if (!mapModel.isPositionTaken(newPosition) && !mapModel.isOutOfBounds(newPosition)) {
                 destinationPosition.set(newPosition);
                 movementProgress = MIN_MOVEMENT_PROGRESS;
             }

@@ -21,23 +21,30 @@ public class HealthBarDecorator implements RenderableEntity {
     private static final int HEALTH_BAR_HEIGHT = 16;
     private static final int HEALTH_BAR_OFFSET_Y = 90;
 
-    private MovingRenderBehavior movingRenderBehavior;
+    private RenderableEntity entity;
     private final HealthBarModel healthBarModel;
+    private GridPoint2 position;
 
-    public HealthBarDecorator(MovingRenderBehavior movingRenderBehavior, HealthBarModel healthBarModel) {
-        this.movingRenderBehavior = movingRenderBehavior;
+    public HealthBarDecorator(RenderableEntity entity, HealthBarModel healthBarModel) {
+        this.entity = entity;
         this.healthBarModel = healthBarModel;
     }
 
     @Override
     public void render(Batch batch, TiledMapTileLayer layer) {
-        movingRenderBehavior.render(batch, layer, healthBarModel.getPosition(),
-        healthBarModel.getDestinationPosition(), healthBarModel.getRotation(), healthBarModel.getMovementProgress());
+        if (!healthBarModel.getVisible()) {
+            return;
+        }
+
+        float relativeHealth = healthBarModel.getHealth() / 100;
+        TextureRegion healthBarTexture = createHealthBarTexture(relativeHealth);
+        Rectangle healthBarRectangle = createHealthBarRectangle();
+        GdxGameUtils.drawTextureRegionUnscaled(batch, healthBarTexture, healthBarRectangle, 0f);
     }
 
     @Override
     public GridPoint2 getPosition() {
-        return healthBarModel.getPosition();
+        return position;
     }
 
     private TextureRegion createHealthBarTexture(float relativeHealth) {
@@ -49,5 +56,13 @@ public class HealthBarDecorator implements RenderableEntity {
         Texture texture = new Texture(pixmap);
         pixmap.dispose();
         return new TextureRegion(texture);
+    }
+
+    private Rectangle createHealthBarRectangle() {
+        Rectangle rectangle = new Rectangle(entity.getRectangle());
+        rectangle.y += HEALTH_BAR_OFFSET_Y;
+        position.x = (int) rectangle.x;
+        position.y = (int) rectangle.y;
+        return rectangle;
     }
 }

@@ -18,18 +18,12 @@ public abstract class LevelGenerator {
     public abstract LevelData generateLevel() throws IOException;
 
     public static class LevelData {
-        private final GridPoint2 playerPosition;
         private final Collection<GridPoint2> treePositions;
         private final Collection<GridPoint2> tankPositions;
 
-        public LevelData(GridPoint2 playerPosition, Collection<GridPoint2> treePositions, Collection<GridPoint2> tankPositions) {
-            this.playerPosition = playerPosition;
+        public LevelData(Collection<GridPoint2> treePositions, Collection<GridPoint2> tankPositions) {
             this.treePositions = new ArrayList<>(treePositions);
             this.tankPositions = new ArrayList<>(tankPositions);
-        }
-
-        public GridPoint2 getPlayerPosition() {
-            return playerPosition;
         }
 
         public Collection<GridPoint2> getTreePositions() {

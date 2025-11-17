@@ -20,8 +20,7 @@ public class LevelGeneratorRandom extends LevelGenerator {
 
     public LevelData generateLevel() {
         List<GridPoint2> treePositions = new ArrayList<>();
-        List<GridPoint2> aiTanksPositions = new ArrayList<>();
-        GridPoint2 playerPosition;
+        List<GridPoint2> tankPositions = new ArrayList<>(aiTanksCount + 1);
 
         for (int i = 0; i < treeCount; ++i) {
             GridPoint2 position;
@@ -31,18 +30,19 @@ public class LevelGeneratorRandom extends LevelGenerator {
             treePositions.add(position);
         }
 
-        for (int i = 0; i < aiTanksCount; ++i) {
+        for (int i = 0; i < aiTanksCount + 1; ++i) {
             GridPoint2 position;
             do {
                 position = new GridPoint2(rng.nextInt(width), rng.nextInt(height));
-            } while (aiTanksPositions.contains(position));
-            aiTanksPositions.add(position);
+            } while (tankPositions.contains(position) || treePositions.contains(position));
+            tankPositions.add(position);
         }
 
-        do {
-            playerPosition = new GridPoint2(rng.nextInt(width), rng.nextInt(height));
-        } while (treePositions.contains(playerPosition) || aiTanksPositions.contains(playerPosition));
+        // do {
+        //     playerPosition = new GridPoint2(rng.nextInt(width), rng.nextInt(height));
+        // } while (treePositions.contains(playerPosition) || aiTanksPositions.contains(playerPosition));
 
-        return new LevelData(playerPosition, treePositions, aiTanksPositions);
+        // return new LevelData(playerPosition, treePositions, aiTanksPositions);
+        return new LevelData(treePositions, tankPositions);
     }
 }

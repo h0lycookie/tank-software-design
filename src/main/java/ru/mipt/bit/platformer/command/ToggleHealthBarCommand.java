@@ -1,6 +1,9 @@
-package ru.mipt.bit.platformer.util;
+package ru.mipt.bit.platformer.command;
 
-public class ToggleHealthBarCommand {
+import ru.mipt.bit.platformer.entity.HealthBarModel;
+import ru.mipt.bit.platformer.entity.interfaces.Command;
+
+public class ToggleHealthBarCommand implements Command {
     private final HealthBarModel healthBarModel;
 
     public ToggleHealthBarCommand(HealthBarModel healthBarModel) {

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -22,24 +21,33 @@ import ru.mipt.bit.platformer.entity.TankGraphics;
 import ru.mipt.bit.platformer.entity.TankModel;
 import ru.mipt.bit.platformer.entity.TreeGraphics;
 import ru.mipt.bit.platformer.entity.TreeModel;
+import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.command.MoveEntityCommand;
+import ru.mipt.bit.platformer.command.ShotCommand;
+import ru.mipt.bit.platformer.command.ToggleHealthBarCommand;
 import ru.mipt.bit.platformer.entity.HealthBarDecorator;
 import ru.mipt.bit.platformer.entity.HealthBarModel;
+import ru.mipt.bit.platformer.entity.MapModel;
 import ru.mipt.bit.platformer.entity.MoveBehavior;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.level.LevelGenerator;
+import ru.mipt.bit.platformer.level.LevelGeneratorFileBased;
 import ru.mipt.bit.platformer.level.LevelGenerator.LevelData;
 import ru.mipt.bit.platformer.level.LevelGeneratorRandom;
 import ru.mipt.bit.platformer.util.AIControlHandler;
 import ru.mipt.bit.platformer.util.ControlHandler;
-import ru.mipt.bit.platformer.util.TankCommand;
+import ru.mipt.bit.platformer.util.Direction;
+import ru.mipt.bit.platformer.util.MoveEntityCommandGenerator;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
+import static com.badlogic.gdx.math.MathUtils.acos;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private Batch batch;
@@ -67,30 +75,57 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         final int TREE_COUNT = 3;
         final int TANKS_COUNT = 3;
+
         LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), TREE_COUNT, TANKS_COUNT);
+        // LevelGenerator levelGenerator = new LevelGeneratorFileBased(layer.getWidth(), layer.getHeight(), levelFilePath);
         LevelData levelObjectsPositions;
-        List<TankModel> aiTanks = new ArrayList<>();
+        List<MovableEntity> aiTanks = new ArrayList<>();
         try {
             levelObjectsPositions = levelGenerator.generateLevel();
 
             final float MOVEMENT_SPEED = 0.4f;
 
-            GridPoint2 playerTankPosition = levelObjectsPositions.getPlayerPosition();
-            MoveBehavior playerTankMoveBehavior = new MoveBehavior(playerTankPosition, MOVEMENT_SPEED, 0f);
-            TankModel playerTankModel = new TankModel(playerTankMoveBehavior);
-            MovingRenderBehavior playerTankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
-            TankGraphics playerTankGraphics = new TankGraphics(playerTankMovingRenderBehavior, playerTankModel);
-            HealthBarModel playerTankHealthBarModel = new HealthBarModel(playerTankMoveBehavior, true);
-            mover.addMovableEntity(new HealthBarModel(playerTankMoveBehavior, true));
-            renderer.addRenderableEntity(new HealthBarDecorator(playerTankMovingRenderBehavior, playerTankHealthBarModel));
+            MapModel mapModel = new MapModel(layer.getWidth(), layer.getHeight());
             
             for (GridPoint2 treePosition: levelObjectsPositions.getTreePositions()) {
-                 RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
-                renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, new TreeModel(treePosition)));
+                RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
+                TreeModel treeModel = new TreeModel(treePosition);
+                renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, treeModel));
+                mapModel.addObstacle(treeModel);
             }
 
-            controlHandler = new ControlHandler(playerTankModel, renderer);
-            aiControlHandler = new AIControlHandler(TankCommand.create(aiTanks));
+            TankModel playerTank = null;
+            for (GridPoint2 tankPosition: levelObjectsPositions.getTankPositions()) {
+                MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, MOVEMENT_SPEED, 0f, mapModel);
+                TankModel tankModel = new TankModel(tankMoveBehavior);
+                if (playerTank == null) {
+                    playerTank = tankModel;
+                } else {
+                    aiTanks.add(tankModel);
+                }
+                mover.addMovableEntity(tankModel);
+                mapModel.addObstacle(tankModel);
+
+                MovingRenderBehavior tankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
+                TankGraphics tankGraphics = new TankGraphics(tankMovingRenderBehavior, tankModel);
+                renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(true)));
+            }
+
+            controlHandler = new ControlHandler();
+            Map<Direction, List<Integer>> controls = Map.of(
+                Direction.UP, List.of(com.badlogic.gdx.Input.Keys.UP, com.badlogic.gdx.Input.Keys.W),
+                Direction.LEFT, List.of(com.badlogic.gdx.Input.Keys.LEFT, com.badlogic.gdx.Input.Keys.A),
+                Direction.DOWN, List.of(com.badlogic.gdx.Input.Keys.DOWN, com.badlogic.gdx.Input.Keys.S),
+                Direction.RIGHT, List.of(com.badlogic.gdx.Input.Keys.RIGHT, com.badlogic.gdx.Input.Keys.D)
+            );
+
+            controls.forEach((direction, keys) ->
+                    controlHandler.addButtonAction(keys,
+                            new MoveEntityCommand(playerTank, direction), true));
+
+            controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.L), new ToggleHealthBarCommand(new HealthBarModel(true)), false);
+            controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.SPACE), new ShotCommand(playerTank), false);
+            aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(aiTanks));
         } catch (IOException e) {
            System.out.printf("caught exception %s, returning...\n", e.getMessage());
            return;
@@ -138,7 +173,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     }
 
     private void processActions() {
-        controlHandler.handleControlInput();
+        controlHandler.handle(Gdx.input);
         aiControlHandler.handle();
         mover.moveEntities(Gdx.graphics.getDeltaTime());
     }

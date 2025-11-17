@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,8 +39,10 @@ public class LevelGeneratorFileBased extends LevelGenerator {
         }
 
         Collection<GridPoint2> treePositions = new ArrayList<>();
-        Collection<GridPoint2> aiTankPositions = new ArrayList<>();
-        GridPoint2 playerPosition = null;
+        Collection<GridPoint2> tankPositions = new ArrayDeque<>();
+        // Collection<GridPoint2> tankPositions = new ArrayList<>();
+        // GridPoint2 playerPosition = null;
+        boolean foundPlayerPosition = false;
 
         for (int y = 0; y < fileHeight; ++y) {
             String line = lines.get(y);
@@ -52,13 +55,14 @@ public class LevelGeneratorFileBased extends LevelGenerator {
                         treePositions.add(position);
                         break;
                     case 'P':
-                        if (playerPosition != null) {
+                    // case 'X':
+                        if (foundPlayerPosition) {
                             throw new IllegalArgumentException("discovered multiple players positions");
                         }
-                        playerPosition = position;
+                        foundPlayerPosition = true;
                         break;
                     case 'X':
-                        aiTankPositions.add(position);
+                        tankPositions.add(position);
                         break;
                     case '_':
                         break;
@@ -68,10 +72,11 @@ public class LevelGeneratorFileBased extends LevelGenerator {
             }
         }
 
-        if (playerPosition == null) {
+        if (!foundPlayerPosition) {
             throw new IllegalArgumentException("No player position in file with level design");
         }
 
-        return new LevelData(playerPosition, treePositions, aiTankPositions);
+        // return new LevelData(playerPosition, treePositions, aiTankPositions);
+        return new LevelData(treePositions, tankPositions);
     }
 }
