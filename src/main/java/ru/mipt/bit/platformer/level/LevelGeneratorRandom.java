@@ -20,7 +20,7 @@ public class LevelGeneratorRandom extends LevelGenerator {
 
     public LevelData generateLevel() {
         List<GridPoint2> treePositions = new ArrayList<>();
-        List<GridPoint2> tankPositions = new ArrayList<>(aiTanksCount + 1);
+        List<GridPoint2> tankPositions = new ArrayList<>(aiTanksCount);
 
         for (int i = 0; i < treeCount; ++i) {
             GridPoint2 position;
@@ -30,7 +30,7 @@ public class LevelGeneratorRandom extends LevelGenerator {
             treePositions.add(position);
         }
 
-        for (int i = 0; i < aiTanksCount + 1; ++i) {
+        for (int i = 0; i < aiTanksCount; ++i) {
             GridPoint2 position;
             do {
                 position = new GridPoint2(rng.nextInt(width), rng.nextInt(height));

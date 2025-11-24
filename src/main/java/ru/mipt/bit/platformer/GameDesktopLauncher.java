@@ -83,8 +83,6 @@ public class GameDesktopLauncher implements ApplicationListener {
         try {
             levelObjectsPositions = levelGenerator.generateLevel();
 
-            final float MOVEMENT_SPEED = 0.4f;
-
             MapModel mapModel = new MapModel(layer.getWidth(), layer.getHeight());
             
             for (GridPoint2 treePosition: levelObjectsPositions.getTreePositions()) {
@@ -96,7 +94,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
             TankModel playerTank = null;
             for (GridPoint2 tankPosition: levelObjectsPositions.getTankPositions()) {
-                MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, MOVEMENT_SPEED, 0f, mapModel);
+                MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, mapModel.getMovementSpeed(), 0f, mapModel);
                 TankModel tankModel = new TankModel(tankMoveBehavior);
                 if (playerTank == null) {
                     playerTank = tankModel;
@@ -111,20 +109,6 @@ public class GameDesktopLauncher implements ApplicationListener {
                 renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(true)));
             }
 
-            controlHandler = new ControlHandler();
-            Map<Direction, List<Integer>> controls = Map.of(
-                Direction.UP, List.of(com.badlogic.gdx.Input.Keys.UP, com.badlogic.gdx.Input.Keys.W),
-                Direction.LEFT, List.of(com.badlogic.gdx.Input.Keys.LEFT, com.badlogic.gdx.Input.Keys.A),
-                Direction.DOWN, List.of(com.badlogic.gdx.Input.Keys.DOWN, com.badlogic.gdx.Input.Keys.S),
-                Direction.RIGHT, List.of(com.badlogic.gdx.Input.Keys.RIGHT, com.badlogic.gdx.Input.Keys.D)
-            );
-
-            controls.forEach((direction, keys) ->
-                    controlHandler.addButtonAction(keys,
-                            new MoveEntityCommand(playerTank, direction), true));
-
-            controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.L), new ToggleHealthBarCommand(new HealthBarModel(true)), false);
-            controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.SPACE), new ShotCommand(playerTank), false);
             aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(aiTanks));
         } catch (IOException e) {
            System.out.printf("caught exception %s, returning...\n", e.getMessage());

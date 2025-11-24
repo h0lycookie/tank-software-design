@@ -2,20 +2,34 @@ package ru.mipt.bit.platformer.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.entity.interfaces.Entity;
 
+@Component
 public class MapModel {
-    private Collection<Entity> obstacles;
-    int width;
-    int height;
+    private final float MOVEMENT_SPEED = 0.4f;
+
+    private Collection<Entity> obstacles = new ArrayList<>();
+    private int width;
+    private int height;
 
     public MapModel(int width, int height) {
-        this.obstacles = new ArrayList<>();
-        this.width = width;
-        this.height = height;
+    }
+
+    public float getMovementSpeed() {
+        return MOVEMENT_SPEED;
+    }
+    
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public void addObstacle(Entity obstacle) {
