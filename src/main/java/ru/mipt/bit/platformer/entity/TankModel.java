@@ -1,7 +1,6 @@
 package ru.mipt.bit.platformer.entity;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import com.badlogic.gdx.math.GridPoint2;
 
@@ -37,8 +36,8 @@ public class TankModel implements MovableEntity, CollidableEntity {
     }
 
     @Override
-    public Collection<GridPoint2> getCollisionPositions() {
-        return List.of(moveBehavior.getPosition(), moveBehavior.getDestinationPosition());
+    public Set<GridPoint2> getCollisionPositions() {
+        return moveBehavior.getCollisionPositions();
     }
 
     public GridPoint2 getDestinationPosition() {

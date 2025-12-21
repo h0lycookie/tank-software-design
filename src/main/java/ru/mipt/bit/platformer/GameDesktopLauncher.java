@@ -21,20 +21,22 @@ import ru.mipt.bit.platformer.entity.TankGraphics;
 import ru.mipt.bit.platformer.entity.TankModel;
 import ru.mipt.bit.platformer.entity.TreeGraphics;
 import ru.mipt.bit.platformer.entity.TreeModel;
+import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 import ru.mipt.bit.platformer.config.Config;
 import ru.mipt.bit.platformer.entity.HealthBarDecorator;
 import ru.mipt.bit.platformer.entity.HealthBarModel;
-import ru.mipt.bit.platformer.entity.MapModel;
+import ru.mipt.bit.platformer.entity.MapState;
 import ru.mipt.bit.platformer.entity.MoveBehavior;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.level.LevelGenerator;
-import ru.mipt.bit.platformer.level.LevelGenerator.LevelData;
 import ru.mipt.bit.platformer.level.LevelGeneratorRandom;
 import ru.mipt.bit.platformer.util.AIControlHandler;
 import ru.mipt.bit.platformer.util.ControlHandler;
 import ru.mipt.bit.platformer.util.MoveEntityCommandGenerator;
+import ru.mipt.bit.platformer.util.ObstacleType;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
@@ -42,69 +44,85 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GameDesktopLauncher implements ApplicationListener {
-
     private static String levelFilePath = "./src/main/resources/level_design.txt";
+
+    final int TREES_COUNT = 0;
+    final int AI_TANKS_COUNT = 3;
+
+    private Batch batch;
+
+    private TiledMap level;
+    private TiledMapTileLayer layer;
+    private TileMovement tileMovement;
+
+    private Mover mover;
+    private Renderer renderer;
+    private MapState mapState;
+    private ControlHandler controlHandler;
+    private AIControlHandler aiControlHandler;
+
+    private MovableEntity playerTank;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
 
-        level = new TmxMapLoader().load("level.tmx");
-        layer = getSingleLayer(level);
-        TileMovement tileMovement = new TileMovement(layer, Interpolation.smooth);
+        generateLevel();
     
         mover = new Mover();
         renderer = new Renderer(createSingleLayerMapRenderer(level, batch));
 
-        final int TREE_COUNT = 0;
-        final int TANKS_COUNT = 3;
+        Map<ObstacleType, Integer> obstacleCounts = Map.of(
+            ObstacleType.TREE, TREES_COUNT,
+            ObstacleType.TANK, AI_TANKS_COUNT + 1   // plus player's tank
+        );
 
-        LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), TREE_COUNT, TANKS_COUNT);
-        // LevelGenerator levelGenerator = new LevelGeneratorFileBased(layer.getWidth(), layer.getHeight(), levelFilePath);
-        LevelData levelObjectsPositions;
-        List<MovableEntity> aiTanks = new ArrayList<>();
+        LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), obstacleCounts);
+        Map<ObstacleType, Set<GridPoint2>> obstaclesUniquePositions;
         try {
-            levelObjectsPositions = levelGenerator.generateLevel();
-
-            MapModel mapModel = new MapModel(layer.getWidth(), layer.getHeight());
-            
-            for (GridPoint2 treePosition: levelObjectsPositions.getTreePositions()) {
-                RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
-                TreeModel treeModel = new TreeModel(treePosition);
-                renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, treeModel));
-                mapModel.addObstacle(treeModel);
-            }
-
-            MoveBehavior playerTankMoveBehavior = new MoveBehavior(new GridPoint2(1, 1), mapModel.getMovementSpeed(), 0f, mapModel);
-            TankModel playerTank = new TankModel(playerTankMoveBehavior);
-            mapModel.setMainTank(playerTank);
-            mapModel.addObstacle(playerTank);
-            mover.addMovableEntity(playerTank);
-            MovingRenderBehavior playerTankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
-            TankGraphics playerTankGraphics = new TankGraphics(playerTankMovingRenderBehavior, playerTank);
-            renderer.addRenderableEntity(new HealthBarDecorator(playerTankGraphics, new HealthBarModel(100, true)));
-
-            for (GridPoint2 tankPosition: levelObjectsPositions.getTankPositions()) {
-                MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, mapModel.getMovementSpeed(), 0f, mapModel);
-                TankModel tankModel = new TankModel(tankMoveBehavior);
-                    aiTanks.add(tankModel);
-                mover.addMovableEntity(tankModel);
-                mapModel.addObstacle(tankModel);
-
-                MovingRenderBehavior tankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
-                TankGraphics tankGraphics = new TankGraphics(tankMovingRenderBehavior, tankModel);
-                renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(80, true)));
-            }
-
-            Config config = new Config();
-            controlHandler = config.controlHandler(mapModel);
-            aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(aiTanks));
+            obstaclesUniquePositions = levelGenerator.getUniqueObstaclesPositions();
         } catch (IOException e) {
            System.out.printf("caught exception %s, returning...\n", e.getMessage());
            return;
         }
+
+        mapState = new MapState(layer.getWidth(), layer.getHeight());
+        
+        for (GridPoint2 treePosition: obstaclesUniquePositions.get(ObstacleType.TREE)) {
+            RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
+            TreeModel treeModel = new TreeModel(treePosition);
+            renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, treeModel));
+            mapState.addObstacle(ObstacleType.TREE, treeModel);
+        }
+
+        List<MovableEntity> tanks = new ArrayList<>();
+        for (GridPoint2 tankPosition: obstaclesUniquePositions.get(ObstacleType.TANK)) {
+            MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, mapState.getMovementSpeed(), 0f, mapState);
+            TankModel tankModel = new TankModel(tankMoveBehavior);
+            tanks.add(tankModel);
+            mover.addMovableEntity(tankModel);
+            mapState.addObstacle(ObstacleType.TANK, tankModel);
+
+            MovingRenderBehavior tankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
+            TankGraphics tankGraphics = new TankGraphics(tankMovingRenderBehavior, tankModel);
+            final float INITIAL_HEALTH = 100.f;
+            renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(INITIAL_HEALTH)));
+        }
+
+        Config config = new Config();
+        playerTank = tanks.get(0); // tanks.get(0) is player tank
+        controlHandler = config.getControlHandler(playerTank);
+        aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(tanks.subList(1, tanks.size()))); // without player tank
+    }
+
+    private void generateLevel() {
+        level = new TmxMapLoader().load("level.tmx");
+        layer = getSingleLayer(level);
+        tileMovement = new TileMovement(layer, Interpolation.smooth);
     }
 
     @Override

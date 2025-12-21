@@ -2,8 +2,7 @@ package ru.mipt.bit.platformer.entity;
 
 import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import com.badlogic.gdx.math.GridPoint2;
 
@@ -20,7 +19,7 @@ public class TreeModel implements CollidableEntity {
     }
 
     @Override
-    public Collection<GridPoint2> getCollisionPositions() {
-        return List.of(position);
+    public Set<GridPoint2> getCollisionPositions() {
+        return Set.of(position);
     }
 }

@@ -1,8 +1,7 @@
 package ru.mipt.bit.platformer.entity;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -32,14 +31,12 @@ public class HealthBarDecorator implements RenderableEntity {
 
     @Override
     public void render(Batch batch, TiledMapTileLayer layer) {
-        if (!healthBarModel.getVisible()) {
-            return;
+        if (HealthBarsState.getInstance().isVisible()) {
+            float relativeHealth = healthBarModel.getHealth() / MAX_POSSIBLE_HEALTH;
+            TextureRegion healthBarTexture = createHealthBarTexture(relativeHealth);
+            Rectangle healthBarRectangle = createHealthBarRectangle();
+            GdxGameUtils.drawTextureRegionUnscaled(batch, healthBarTexture, healthBarRectangle, 0f);
         }
-
-        float relativeHealth = healthBarModel.getHealth() / MAX_POSSIBLE_HEALTH;
-        TextureRegion healthBarTexture = createHealthBarTexture(relativeHealth);
-        Rectangle healthBarRectangle = createHealthBarRectangle();
-        GdxGameUtils.drawTextureRegionUnscaled(batch, healthBarTexture, healthBarRectangle, 0f);
 
         entity.render(batch, layer);
     }
@@ -55,8 +52,8 @@ public class HealthBarDecorator implements RenderableEntity {
     }
 
     @Override
-    public Collection<GridPoint2> getCollisionPositions() {
-        return Collections.emptyList();
+    public Set<GridPoint2> getCollisionPositions() {
+        return Collections.emptySet();
     }
 
     public float getHealth() {

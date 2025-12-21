@@ -1,37 +1,13 @@
 package ru.mipt.bit.platformer.level;
 
-import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.util.ObstacleType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
-public abstract class LevelGenerator {
-    protected final int width;
-    protected final int height;
+import com.badlogic.gdx.math.GridPoint2;
 
-    protected LevelGenerator(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    public abstract LevelData generateLevel() throws IOException;
-
-    public static class LevelData {
-        private final Collection<GridPoint2> treePositions;
-        private final Collection<GridPoint2> tankPositions;
-
-        public LevelData(Collection<GridPoint2> treePositions, Collection<GridPoint2> tankPositions) {
-            this.treePositions = new ArrayList<>(treePositions);
-            this.tankPositions = new ArrayList<>(tankPositions);
-        }
-
-        public Collection<GridPoint2> getTreePositions() {
-            return new ArrayList<>(treePositions);
-        }
-
-        public Collection<GridPoint2> getTankPositions() {
-            return new ArrayList<>(tankPositions);
-        }
-    }
+public interface LevelGenerator {
+    public Map<ObstacleType, Set<GridPoint2>> getUniqueObstaclesPositions() throws IOException;
 }

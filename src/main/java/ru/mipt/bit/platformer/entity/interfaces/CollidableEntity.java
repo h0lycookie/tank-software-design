@@ -1,9 +1,9 @@
 package ru.mipt.bit.platformer.entity.interfaces;
 
-import java.util.Collection;
+import java.util.Set;
 
 import com.badlogic.gdx.math.GridPoint2;
 
 public interface CollidableEntity extends PositionableEntity {
-    Collection<GridPoint2> getCollisionPositions();
+    Set<GridPoint2> getCollisionPositions();
 }

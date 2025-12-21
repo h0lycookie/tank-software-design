@@ -2,81 +2,103 @@ package ru.mipt.bit.platformer.level;
 
 import com.badlogic.gdx.math.GridPoint2;
 
+import ru.mipt.bit.platformer.util.ObstacleType;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class LevelGeneratorFileBased extends LevelGenerator {
+public class LevelGeneratorFileBased implements LevelGenerator {
+    private final int width;
+    private final int height;
     private final String filePath;
 
     public LevelGeneratorFileBased(int width, int height, String filePath) {
-        super(width, height);
+        this.width = width;
+        this.height = height;
         this.filePath = filePath;
     }
 
-    public LevelData generateLevel() throws IOException {
+    @Override
+    public Map<ObstacleType, Set<GridPoint2>> getUniqueObstaclesPositions() throws IOException {
+        Map<ObstacleType, Set<GridPoint2>> obstaclesPositions;
+        try {
+            obstaclesPositions = parseLevelMap();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to parse level Map \"" + filePath + "\"");
+        }
+
+        return obstaclesPositions;
+    }
+
+    private Map<ObstacleType, Set<GridPoint2>> parseLevelMap() throws IOException {
+        Map<ObstacleType, Set<GridPoint2>> obstaclesPositions = new HashMap<>();
+        List<String> fileLines = getfileLines(filePath);
+
+        boolean foundPlayerPosition = false;
+        for (int y = 0; y < height; ++y) {
+            String line = fileLines.get(y);
+            foundPlayerPosition |= parseLine(line, y, foundPlayerPosition, obstaclesPositions);
+        }
+
+        return obstaclesPositions;
+    }
+
+    private List<String> getfileLines(String filePath) throws IOException {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (width != line.length())
                 lines.add(line);
             }
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to read file \"" + filePath + "\"");
         }
+        
+        return lines;
+    }
 
-        if (lines.isEmpty()) {
-            throw new IllegalArgumentException("level-describing file is empty");
-        }
+    private boolean parseLine(String line, int rowCount, boolean foundPlayerPosition, Map<ObstacleType, Set<GridPoint2>> obstaclesPositions) {
+        for (int x = 0; x < width; ++x) {
+            char symbol = line.charAt(x);
+            GridPoint2 position = new GridPoint2(x, (height - 1) - rowCount);
 
-        int fileWidth = lines.get(0).length();
-        int fileHeight = lines.size();
-        if (fileWidth != width || fileHeight != height) {
-            throw new IllegalArgumentException("level size mismatch: got (" + width + "," + height +
-                    "); expected (" + fileWidth + "," + fileHeight + ")");
-        }
-
-        Collection<GridPoint2> treePositions = new ArrayList<>();
-        Collection<GridPoint2> tankPositions = new ArrayDeque<>();
-        // Collection<GridPoint2> tankPositions = new ArrayList<>();
-        // GridPoint2 playerPosition = null;
-        boolean foundPlayerPosition = false;
-
-        for (int y = 0; y < fileHeight; ++y) {
-            String line = lines.get(y);
-            for (int x = 0; x < fileWidth; ++x) {
-                char symbol = line.charAt(x);
-                GridPoint2 position = new GridPoint2(x, (height - 1) - y);
-
-                switch (symbol) {
-                    case 'T':
-                        treePositions.add(position);
-                        break;
-                    case 'P':
-                    // case 'X':
-                        if (foundPlayerPosition) {
-                            throw new IllegalArgumentException("discovered multiple players positions");
-                        }
-                        foundPlayerPosition = true;
-                        break;
-                    case 'X':
-                        tankPositions.add(position);
-                        break;
-                    case '_':
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown symbol '" + symbol + "' at (" + x + "," + y + ")");
-                }
+            switch (symbol) {
+                case 'T':
+                    putByObstacleType(ObstacleType.TREE, position, obstaclesPositions);
+                    break;
+                case 'P':
+                    if (foundPlayerPosition) {
+                        throw new IllegalArgumentException("discovered multiple players positions");
+                    }
+                    foundPlayerPosition = true;
+                    putByObstacleType(ObstacleType.TANK, position, obstaclesPositions);
+                    break;
+                case 'X':
+                    putByObstacleType(ObstacleType.TREE, position, obstaclesPositions);
+                    break;
+                case '_':
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown symbol '" + symbol + "' at (" + x + "," + rowCount + ")");
             }
         }
 
-        if (!foundPlayerPosition) {
-            throw new IllegalArgumentException("No player position in file with level design");
-        }
+        return foundPlayerPosition;
+    }
 
-        // return new LevelData(playerPosition, treePositions, aiTankPositions);
-        return new LevelData(treePositions, tankPositions);
+    private void putByObstacleType(ObstacleType type, GridPoint2 position, Map<ObstacleType, Set<GridPoint2>> obstaclesPositions) {
+        Set<GridPoint2> obstaclePositionsByType = obstaclesPositions.get(type);
+        if (obstaclePositionsByType == null) {
+            obstaclePositionsByType = new HashSet<>();
+        }
+        obstaclePositionsByType.add(position);
     }
 }
