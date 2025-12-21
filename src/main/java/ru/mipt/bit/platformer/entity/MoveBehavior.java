@@ -16,7 +16,7 @@ public class MoveBehavior {
     private float rotation;
     private float movementSpeed;
     private float movementProgress = MAX_MOVEMENT_PROGRESS;
-    private final MapModel mapModel;
+    private final MapModel mapModel; 
 
     public MoveBehavior(GridPoint2 position, float movementSpeed, float rotation, MapModel mapModel) {
         this.position = position.cpy();

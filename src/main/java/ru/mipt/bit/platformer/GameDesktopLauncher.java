@@ -22,9 +22,7 @@ import ru.mipt.bit.platformer.entity.TankModel;
 import ru.mipt.bit.platformer.entity.TreeGraphics;
 import ru.mipt.bit.platformer.entity.TreeModel;
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
-import ru.mipt.bit.platformer.command.MoveEntityCommand;
-import ru.mipt.bit.platformer.command.ShotCommand;
-import ru.mipt.bit.platformer.command.ToggleHealthBarCommand;
+import ru.mipt.bit.platformer.config.Config;
 import ru.mipt.bit.platformer.entity.HealthBarDecorator;
 import ru.mipt.bit.platformer.entity.HealthBarModel;
 import ru.mipt.bit.platformer.entity.MapModel;
@@ -32,22 +30,18 @@ import ru.mipt.bit.platformer.entity.MoveBehavior;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.level.LevelGenerator;
-import ru.mipt.bit.platformer.level.LevelGeneratorFileBased;
 import ru.mipt.bit.platformer.level.LevelGenerator.LevelData;
 import ru.mipt.bit.platformer.level.LevelGeneratorRandom;
 import ru.mipt.bit.platformer.util.AIControlHandler;
 import ru.mipt.bit.platformer.util.ControlHandler;
-import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.MoveEntityCommandGenerator;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
-import static com.badlogic.gdx.math.MathUtils.acos;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private Batch batch;
@@ -73,7 +67,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         mover = new Mover();
         renderer = new Renderer(createSingleLayerMapRenderer(level, batch));
 
-        final int TREE_COUNT = 3;
+        final int TREE_COUNT = 0;
         final int TANKS_COUNT = 3;
 
         LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), TREE_COUNT, TANKS_COUNT);
@@ -92,23 +86,29 @@ public class GameDesktopLauncher implements ApplicationListener {
                 mapModel.addObstacle(treeModel);
             }
 
-            TankModel playerTank = null;
+            MoveBehavior playerTankMoveBehavior = new MoveBehavior(new GridPoint2(1, 1), mapModel.getMovementSpeed(), 0f, mapModel);
+            TankModel playerTank = new TankModel(playerTankMoveBehavior);
+            mapModel.setMainTank(playerTank);
+            mapModel.addObstacle(playerTank);
+            mover.addMovableEntity(playerTank);
+            MovingRenderBehavior playerTankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
+            TankGraphics playerTankGraphics = new TankGraphics(playerTankMovingRenderBehavior, playerTank);
+            renderer.addRenderableEntity(new HealthBarDecorator(playerTankGraphics, new HealthBarModel(100, true)));
+
             for (GridPoint2 tankPosition: levelObjectsPositions.getTankPositions()) {
                 MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, mapModel.getMovementSpeed(), 0f, mapModel);
                 TankModel tankModel = new TankModel(tankMoveBehavior);
-                if (playerTank == null) {
-                    playerTank = tankModel;
-                } else {
                     aiTanks.add(tankModel);
-                }
                 mover.addMovableEntity(tankModel);
                 mapModel.addObstacle(tankModel);
 
                 MovingRenderBehavior tankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
                 TankGraphics tankGraphics = new TankGraphics(tankMovingRenderBehavior, tankModel);
-                renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(true)));
+                renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(80, true)));
             }
 
+            Config config = new Config();
+            controlHandler = config.controlHandler(mapModel);
             aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(aiTanks));
         } catch (IOException e) {
            System.out.printf("caught exception %s, returning...\n", e.getMessage());

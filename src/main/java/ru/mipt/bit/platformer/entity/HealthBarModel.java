@@ -1,12 +1,17 @@
 package ru.mipt.bit.platformer.entity;
 
-import ru.mipt.bit.platformer.entity.interfaces.HealthableEntity;
 
-public class HealthBarModel implements HealthableEntity {
+public class HealthBarModel {
+    private float health;
     private boolean visible;
 
-    public HealthBarModel(boolean visible) {
+    public HealthBarModel(float health, boolean visible) {
+        this.health = health;
         this.visible = visible;
+    }
+
+    public float getHealth() {
+        return health;
     }
 
     public boolean getVisible() {
@@ -15,10 +20,5 @@ public class HealthBarModel implements HealthableEntity {
 
     public void switchVisibility() {
         visible = !visible;
-    }
-
-    @Override
-    public float getHealth() {
-        return 100;
     }
 }

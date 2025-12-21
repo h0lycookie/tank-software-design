@@ -2,22 +2,30 @@ package ru.mipt.bit.platformer.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.entity.interfaces.Entity;
+import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
 
-@Component
 public class MapModel {
     private final float MOVEMENT_SPEED = 0.4f;
 
-    private Collection<Entity> obstacles = new ArrayList<>();
+    private Collection<CollidableEntity> obstacles = new ArrayList<>();
     private int width;
     private int height;
 
+    TankModel mainTank;
+
     public MapModel(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public void setMainTank(TankModel tank) {
+        mainTank = tank;
+    }
+    public TankModel getMainTank() {
+        return mainTank;
     }
 
     public float getMovementSpeed() {
@@ -32,12 +40,12 @@ public class MapModel {
         return height;
     }
 
-    public void addObstacle(Entity obstacle) {
+    public void addObstacle(CollidableEntity obstacle) {
         obstacles.add(obstacle);
     }
 
     public boolean isPositionTaken(GridPoint2 position) {
-        return obstacles.stream().anyMatch(entity -> position.equals(entity.getPosition()));
+        return obstacles.stream().anyMatch(entity -> entity.getCollisionPositions().contains(position));
     }
 
     public boolean isOutOfBounds(GridPoint2 position) {
