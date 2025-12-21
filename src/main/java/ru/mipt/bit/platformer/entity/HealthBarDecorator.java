@@ -2,6 +2,7 @@ package ru.mipt.bit.platformer.entity;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

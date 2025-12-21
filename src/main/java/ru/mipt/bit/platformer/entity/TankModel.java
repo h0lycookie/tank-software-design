@@ -6,10 +6,8 @@ import java.util.List;
 import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
-import ru.mipt.bit.platformer.entity.interfaces.HealthableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.Observer;
-import ru.mipt.bit.platformer.entity.interfaces.Shoots;
 import ru.mipt.bit.platformer.util.Direction;
 
 public class TankModel implements MovableEntity, CollidableEntity {

@@ -44,15 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameDesktopLauncher implements ApplicationListener {
-    private Batch batch;
-
-    private TiledMap level;
-    private TiledMapTileLayer layer;
-
-    private Mover mover;
-    private Renderer renderer;
-    private ControlHandler controlHandler;
-    private AIControlHandler aiControlHandler;
 
     private static String levelFilePath = "./src/main/resources/level_design.txt";
 

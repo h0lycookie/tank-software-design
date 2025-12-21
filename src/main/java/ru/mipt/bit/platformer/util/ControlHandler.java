@@ -12,7 +12,6 @@ import ru.mipt.bit.platformer.entity.interfaces.Command;
 public class ControlHandler {
     List<ButtonAction> buttonActions;
     
-
     public ControlHandler() {
         buttonActions = new ArrayList<>();
     }
