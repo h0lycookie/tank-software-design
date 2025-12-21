@@ -50,9 +50,6 @@ import java.util.Set;
 public class GameDesktopLauncher implements ApplicationListener {
     private static String levelFilePath = "./src/main/resources/level_design.txt";
 
-    final int TREES_COUNT = 0;
-    final int AI_TANKS_COUNT = 3;
-
     private Batch batch;
 
     private TiledMap level;
@@ -69,6 +66,8 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void create() {
+        Config config = new Config();
+
         batch = new SpriteBatch();
 
         generateLevel();
@@ -76,10 +75,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         mover = new Mover();
         renderer = new Renderer(createSingleLayerMapRenderer(level, batch));
 
-        Map<ObstacleType, Integer> obstacleCounts = Map.of(
-            ObstacleType.TREE, TREES_COUNT,
-            ObstacleType.TANK, AI_TANKS_COUNT + 1   // plus player's tank
-        );
+        Map<ObstacleType, Integer> obstacleCounts = config.getObstaclesCount();
 
         LevelGenerator levelGenerator = new LevelGeneratorRandom(layer.getWidth(), layer.getHeight(), obstacleCounts);
         Map<ObstacleType, Set<GridPoint2>> obstaclesUniquePositions;
@@ -109,11 +105,9 @@ public class GameDesktopLauncher implements ApplicationListener {
 
             MovingRenderBehavior tankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
             TankGraphics tankGraphics = new TankGraphics(tankMovingRenderBehavior, tankModel);
-            final float INITIAL_HEALTH = 100.f;
-            renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(INITIAL_HEALTH)));
+            renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(config.getTankInitialHealth())));
         }
 
-        Config config = new Config();
         playerTank = tanks.get(0); // tanks.get(0) is player tank
         controlHandler = config.getControlHandler(playerTank);
         aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(tanks.subList(1, tanks.size()))); // without player tank
