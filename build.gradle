@@ -28,5 +28,9 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter:3.4.8'
 
+    implementation 'org.springframework:spring-context:5.3.27'
+    
+    implementation 'org.springframework:spring-aspects:5.3.27'
+
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 }

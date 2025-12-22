@@ -36,6 +36,9 @@ public class BulletObserver implements Observer {
         if (entity instanceof BulletModel bulletModel) {
             renderer.removeRenderableEntityByModel(bulletModel);
             mover.removeMovableEntity(bulletModel);
+        } else if (entity instanceof TankModel tankModel) {
+            renderer.removeRenderableEntityByModel(tankModel);
+            mover.removeMovableEntity(tankModel);   
         }
     }
 }
