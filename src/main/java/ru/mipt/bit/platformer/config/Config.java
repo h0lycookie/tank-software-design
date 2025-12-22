@@ -2,20 +2,22 @@ package ru.mipt.bit.platformer.config;
 
 import java.util.List;
 import java.util.Map;
-import ru.mipt.bit.platformer.command.MoveEntityCommand;
+import ru.mipt.bit.platformer.command.MoveTankCommand;
+import ru.mipt.bit.platformer.command.ShotCommand;
 import ru.mipt.bit.platformer.command.ToggleHealthBarCommand;
-import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.MovableShootsEntity;
 import ru.mipt.bit.platformer.util.ControlHandler;
 import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.ObjectType;
 
 public class Config {
     private final int TREES_COUNT = 0;
-    private final int AI_TANKS_COUNT = 3;
+    private final int AI_TANKS_COUNT = 0;
     private final float INITIAL_HEALTH = 90.f;
-    private final float MOVEMENT_SPEED = 0.4f;
+    private final float TANK_MOVEMENT_SPEED = 0.4f;
+    private final float BULLET_MOVEMENT_SPEED = 0.8f;
 
-    public ControlHandler getControlHandler(MovableEntity playerTank) {
+    public ControlHandler getControlHandler(MovableShootsEntity playerTank) {
         ControlHandler controlHandler = new ControlHandler();
 
         Map<Direction, List<Integer>> controls = Map.of(
@@ -28,11 +30,11 @@ public class Config {
 
         controls.forEach((direction, keys) ->
             controlHandler.addButtonAction(keys,
-                    new MoveEntityCommand(playerTank, direction), true));
+                    new MoveTankCommand(playerTank, direction), true));
 
 
         controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.L), new ToggleHealthBarCommand(), false);
-        // controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.SPACE), new ShotCommand(playerTank), false);
+        controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.SPACE), new ShotCommand(playerTank), false);
         
         return controlHandler;
     }
@@ -48,7 +50,11 @@ public class Config {
         return INITIAL_HEALTH;
     }
 
-    public float getMovementSpeed() {
-        return MOVEMENT_SPEED;
+    public float getTankMovementSpeed() {
+        return TANK_MOVEMENT_SPEED;
+    }
+    
+    public float getBulletMovementSpeed() {
+        return BULLET_MOVEMENT_SPEED;
     }
 }

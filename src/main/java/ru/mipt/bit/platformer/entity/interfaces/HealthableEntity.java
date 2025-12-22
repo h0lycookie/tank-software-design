@@ -1,5 +1,5 @@
 package ru.mipt.bit.platformer.entity.interfaces;
 
-public interface HealthableEntity {
+public interface HealthableEntity extends Entity {
     float getHealth();
 }

@@ -56,6 +56,15 @@ public class HealthBarDecorator implements RenderableEntity {
         return Collections.emptySet();
     }
 
+    @Override
+    public void destroy() {
+        entity.destroy();
+    }
+
+    public void damage(float damage) {
+
+    }
+
     public float getHealth() {
         return healthBarModel.getHealth();
     }

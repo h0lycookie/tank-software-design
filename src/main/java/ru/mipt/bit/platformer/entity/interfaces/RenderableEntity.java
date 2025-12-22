@@ -8,4 +8,6 @@ public interface RenderableEntity extends CollidableEntity {
     public void render(Batch batch, TiledMapTileLayer layer);
 
     public Rectangle getRectangle();
+
+    public void destroy();
 };

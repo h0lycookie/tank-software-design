@@ -3,6 +3,7 @@ package ru.mipt.bit.platformer.entity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +14,10 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.config.Config;
 import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
-import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.Entity;
+import ru.mipt.bit.platformer.entity.interfaces.MovableShootsEntity;
+import ru.mipt.bit.platformer.entity.interfaces.Observer;
+import ru.mipt.bit.platformer.entity.interfaces.RemovableFrom;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.level.LevelGenerator;
@@ -21,32 +25,36 @@ import ru.mipt.bit.platformer.level.LevelGeneratorRandom;
 import ru.mipt.bit.platformer.util.ObjectType;
 import ru.mipt.bit.platformer.util.TileMovement;
 
-public class MapState {
+public class MapState implements RemovableFrom {
     private int width;
     private int height;
     private Config config;
     
-    Map<ObjectType, List<CollidableEntity>> obstaclesByType;
-    MovableEntity playerTank;
-    List<MovableEntity> aiTanks;
+    Map<ObjectType, Set<CollidableEntity>> objectsByType;
+    MovableShootsEntity playerTank;
+    Set<TankModel> aiTanks;
 
     public MapState(int width, int height, Config config) {
         this.width = width;
         this.height = height;
         this.config = config;
-        this.obstaclesByType = new HashMap<>();
+        this.objectsByType = new HashMap<>();
+        this.playerTank = null;
+        this.aiTanks = new HashSet<>();
     }
 
     public void initGameObjects(Renderer renderer, Mover mover, TileMovement tileMovement) {
+        Observer observer = new BulletObserver(renderer, mover, tileMovement);
+
         Map<ObjectType, Set<GridPoint2>> objectsUniquePositions = getObjectsUniquePositions(config);
 
         initTrees(renderer, objectsUniquePositions);
-        initTanks(renderer, mover, tileMovement, objectsUniquePositions);
+        initTanks(renderer, mover, tileMovement, objectsUniquePositions, observer);
     }
 
     public boolean isPositionTaken(GridPoint2 position) {
-        for (List<CollidableEntity> obstaclesOfType: obstaclesByType.values()) {
-            if (obstaclesOfType.stream().anyMatch(obstacle -> obstacle.getCollisionPositions().contains(position))) {
+        for (Set<CollidableEntity> objectsOfType: objectsByType.values()) {
+            if (objectsOfType.stream().anyMatch(object -> object.getCollisionPositions().contains(position))) {
                 return true;
             }
         }
@@ -54,30 +62,58 @@ public class MapState {
         return false;
     }
 
+    public void removeEntity(Entity entity) {
+        objectsByType.forEach((type, objectsOfType) -> {
+            if (objectsOfType.remove(entity)) {
+                return;
+            }
+        });
+    }
+ 
+    public CollidableEntity positionTakenBy(GridPoint2 position) {
+        for (Set<CollidableEntity> objectsOfType: objectsByType.values()) {
+            for (CollidableEntity object: objectsOfType) {
+                if (object.getPosition().equals(position)) {
+                    return object;
+                }
+            }
+        }
+        
+        return null;
+    }
+
     public boolean isOutOfBounds(GridPoint2 position) {
         return !(position.x >= 0 && position.x < width &&
                  position.y >= 0 && position.y < height);
     }
 
-    public MovableEntity getPlayerTank() {
+    public MovableShootsEntity getPlayerTank() {
         return playerTank;
     }
 
-    public List<MovableEntity> getAITanks() {
+    public Set<TankModel> getAITanks() {
         return aiTanks;
     }
 
-    private void addObject(ObjectType type, CollidableEntity obstacle) {
-        List<CollidableEntity> obstacles = getObjects(type);
-        if (obstacles == null) {
-            obstacles = new ArrayList<>();
-            obstaclesByType.put(type, obstacles);
+    public void addObject(ObjectType type, CollidableEntity object) {
+        Set<CollidableEntity> objects = getObjects(type);
+        if (objects == null) {
+            objects = new HashSet<>();
+            objectsByType.put(type, objects);
         }
-        obstacles.add(obstacle);
+        objects.add(object);
     }
 
-    private List<CollidableEntity> getObjects(ObjectType type) {
-        return obstaclesByType.get(type);
+    public void removeObject(ObjectType type, CollidableEntity object) {
+        Set<CollidableEntity> objects = getObjects(type);
+        if (objects == null) {
+            return;
+        }
+        objects.remove(object);
+    }
+
+    private Set<CollidableEntity> getObjects(ObjectType type) {
+        return objectsByType.get(type);
     }
 
     private Map<ObjectType, Set<GridPoint2>> getObjectsUniquePositions(Config config) {
@@ -101,11 +137,12 @@ public class MapState {
         }
     }
 
-    private void initTanks(Renderer renderer, Mover mover, TileMovement tileMovement, Map<ObjectType, Set<GridPoint2>> objectsUniquePositions) {
-        List<MovableEntity> tanks = new ArrayList<>();
+    private void initTanks(Renderer renderer, Mover mover, TileMovement tileMovement, Map<ObjectType, Set<GridPoint2>> objectsUniquePositions, Observer observer) {
+        List<TankModel> tanks = new ArrayList<>();
         for (GridPoint2 tankPosition: objectsUniquePositions.get(ObjectType.TANK)) {
-            MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, config.getMovementSpeed(), 0f, this);
+            MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, config.getTankMovementSpeed(), 0f, this);
             TankModel tankModel = new TankModel(tankMoveBehavior);
+            tankModel.setObserver(observer);
             tanks.add(tankModel);
             mover.addMovableEntity(tankModel);
             addObject(ObjectType.TANK, tankModel);
@@ -116,6 +153,6 @@ public class MapState {
         }
 
         playerTank = tanks.get(0);
-        aiTanks = tanks.subList(1, tanks.size());
+        aiTanks.addAll(tanks.subList(1, tanks.size()));
     }
 }

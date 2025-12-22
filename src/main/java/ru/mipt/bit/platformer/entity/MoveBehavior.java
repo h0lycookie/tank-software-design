@@ -66,9 +66,17 @@ public class MoveBehavior {
         return movementProgress;
     }
 
+    public MapState getMapState() {
+        return mapState;
+    }
+
     public Set<GridPoint2> getCollisionPositions() {
         // Set.of throws if contains duplicates
         return (getPosition().equals(getDestinationPosition())) ? Set.of(getPosition()) : Set.of(getPosition(), getDestinationPosition());
+    }
+
+    public boolean isMoving() {
+        return !finishedMoving();
     }
 
     private boolean finishedMoving() {

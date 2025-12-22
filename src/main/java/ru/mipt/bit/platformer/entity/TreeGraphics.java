@@ -37,4 +37,8 @@ public class TreeGraphics implements RenderableEntity {
     public Set<GridPoint2> getCollisionPositions() {
         return Set.of(getPosition());
     }
+
+    @Override
+    public void destroy() {
+    }
 }

@@ -18,7 +18,7 @@ import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.AIControlHandler;
 import ru.mipt.bit.platformer.util.ControlHandler;
-import ru.mipt.bit.platformer.util.MoveEntityCommandGenerator;
+import ru.mipt.bit.platformer.util.TankCommandGenerator;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
@@ -49,7 +49,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         mapState.initGameObjects(renderer, mover, tileMovement);
 
         controlHandler = config.getControlHandler(mapState.getPlayerTank());
-        aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(mapState.getAITanks()));
+        aiControlHandler = new AIControlHandler(TankCommandGenerator.create(mapState.getAITanks()));
     }
 
     @Override

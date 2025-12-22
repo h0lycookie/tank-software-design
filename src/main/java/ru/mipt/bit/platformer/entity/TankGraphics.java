@@ -38,4 +38,7 @@ public class TankGraphics implements RenderableEntity {
     public Set<GridPoint2> getCollisionPositions() {
         return tankModel.getCollisionPositions();
     }
+
+    @Override
+    public void destroy() {}
 }
