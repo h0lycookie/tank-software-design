@@ -10,9 +10,9 @@ import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.TileMovement;
 
 public class BulletObserver implements Observer {
-    private Renderer renderer;
-    private Mover mover;
-    private TileMovement tileMovement;
+    private final Renderer renderer;
+    private final Mover mover;
+    private final TileMovement tileMovement;
 
     public BulletObserver(Renderer renderer, Mover mover, TileMovement tileMovement) {
         this.renderer = renderer;
@@ -20,9 +20,9 @@ public class BulletObserver implements Observer {
         this.tileMovement = tileMovement;
     }
 
+    @Override
     public void onObjectRegistered(Entity entity) {
-        if (entity instanceof BulletModel) {
-            BulletModel bulletModel = (BulletModel) entity;
+        if (entity instanceof BulletModel bulletModel) {
             RenderBehavior renderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/bullet.png")));
             MovingRenderBehavior movingRenderBehavior = new MovingRenderBehavior(renderBehavior, tileMovement);
             BulletGraphics bulletGraphics = new BulletGraphics(movingRenderBehavior, bulletModel);
@@ -31,10 +31,11 @@ public class BulletObserver implements Observer {
         }
     }
 
+    @Override
     public void onObjectDiscarded(Entity entity) {
-        if (entity instanceof BulletModel) {
-            renderer.removeEntity(entity);
-            mover.removeEntity(entity);
+        if (entity instanceof BulletModel bulletModel) {
+            renderer.removeRenderableEntityByModel(bulletModel);
+            mover.removeMovableEntity(bulletModel);
         }
     }
 }

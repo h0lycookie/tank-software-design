@@ -7,13 +7,13 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
-import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
-import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
-import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;;
+import ru.mipt.bit.platformer.entity.interfaces.PositionableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
+;
 
 public class BulletGraphics implements RenderableEntity {
-    private MovingRenderBehavior movingRenderBehavior; 
-    private BulletModel bulletModel;
+    private final MovingRenderBehavior movingRenderBehavior; 
+    private final BulletModel bulletModel;
 
     public BulletGraphics(MovingRenderBehavior movingRenderBehavior, BulletModel bulletModel) {
         this.movingRenderBehavior = movingRenderBehavior;
@@ -42,7 +42,7 @@ public class BulletGraphics implements RenderableEntity {
     }
 
     @Override
-    public CollidableEntity getModel() {
+    public PositionableEntity getModel() {
         return bulletModel;
     }
 

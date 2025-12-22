@@ -9,7 +9,7 @@ public interface RenderableEntity extends CollidableEntity {
 
     public Rectangle getRectangle();
 
-    public CollidableEntity getModel();
+    public PositionableEntity getModel();
 
     public void destroy();
 };

@@ -1,9 +1,5 @@
 package ru.mipt.bit.platformer.level;
 
-import com.badlogic.gdx.math.GridPoint2;
-
-import ru.mipt.bit.platformer.util.ObjectType;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,6 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.badlogic.gdx.math.GridPoint2;
+
+import ru.mipt.bit.platformer.util.ObjectType;
 
 public class LevelGeneratorFileBased implements LevelGenerator {
     private final int width;
@@ -71,23 +71,18 @@ public class LevelGeneratorFileBased implements LevelGenerator {
             GridPoint2 position = new GridPoint2(x, (height - 1) - rowCount);
 
             switch (symbol) {
-                case 'T':
-                    putByObjectType(ObjectType.TREE, position, obstaclesPositions);
-                    break;
-                case 'P':
+                case 'T' -> putByObjectType(ObjectType.TREE, position, obstaclesPositions);
+                case 'P' -> {
                     if (foundPlayerPosition) {
                         throw new IllegalArgumentException("discovered multiple players positions");
                     }
                     foundPlayerPosition = true;
                     putByObjectType(ObjectType.TANK, position, obstaclesPositions);
-                    break;
-                case 'X':
-                    putByObjectType(ObjectType.TREE, position, obstaclesPositions);
-                    break;
-                case '_':
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown symbol '" + symbol + "' at (" + x + "," + rowCount + ")");
+                }
+                case 'X' -> putByObjectType(ObjectType.TREE, position, obstaclesPositions);
+                case '_' -> {
+                }
+                default -> throw new IllegalArgumentException("Unknown symbol '" + symbol + "' at (" + x + "," + rowCount + ")");
             }
         }
 

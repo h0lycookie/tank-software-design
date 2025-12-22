@@ -2,11 +2,11 @@ package ru.mipt.bit.platformer.entity;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,10 +14,8 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.config.Config;
 import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
-import ru.mipt.bit.platformer.entity.interfaces.Entity;
 import ru.mipt.bit.platformer.entity.interfaces.MovableShootsEntity;
 import ru.mipt.bit.platformer.entity.interfaces.Observer;
-import ru.mipt.bit.platformer.entity.interfaces.RemovableFrom;
 import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.level.LevelGenerator;
@@ -25,10 +23,10 @@ import ru.mipt.bit.platformer.level.LevelGeneratorRandom;
 import ru.mipt.bit.platformer.util.ObjectType;
 import ru.mipt.bit.platformer.util.TileMovement;
 
-public class MapState implements RemovableFrom {
-    private int width;
-    private int height;
-    private Config config;
+public class MapState {
+    private final int width;
+    private final int height;
+    private final Config config;
     
     Map<ObjectType, Set<CollidableEntity>> objectsByType;
     MovableShootsEntity playerTank;
@@ -38,7 +36,7 @@ public class MapState implements RemovableFrom {
         this.width = width;
         this.height = height;
         this.config = config;
-        this.objectsByType = new HashMap<>();
+        this.objectsByType = new ConcurrentHashMap<>();
         this.playerTank = null;
         this.aiTanks = new HashSet<>();
     }
@@ -61,14 +59,6 @@ public class MapState implements RemovableFrom {
         
         return false;
     }
-
-    public void removeEntity(Entity entity) {
-        objectsByType.forEach((type, objectsOfType) -> {
-            if (objectsOfType.remove(entity)) {
-                return;
-            }
-        });
-    }
  
     public CollidableEntity positionTakenBy(GridPoint2 position) {
         for (Set<CollidableEntity> objectsOfType: objectsByType.values()) {
@@ -80,6 +70,14 @@ public class MapState implements RemovableFrom {
         }
         
         return null;
+    }
+
+    public void removeEntity(CollidableEntity entity) {
+        for (Set<CollidableEntity> objectsOfType: objectsByType.values()) {
+            if (objectsOfType.remove(entity)) {
+                return;
+            }
+        }
     }
 
     public boolean isOutOfBounds(GridPoint2 position) {

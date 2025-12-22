@@ -10,7 +10,7 @@ import ru.mipt.bit.platformer.util.GdxGameUtils;
 
 public class RenderBehavior {
     private Rectangle rectangle;
-    private TextureRegion sprite;
+    private final TextureRegion sprite;
 
     public RenderBehavior(TextureRegion sprite) {
         this.rectangle = GdxGameUtils.createBoundingRectangle(sprite);

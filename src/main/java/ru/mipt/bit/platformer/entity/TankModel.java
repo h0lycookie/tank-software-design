@@ -18,7 +18,7 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
     private float cooldown = INITIAL_COOLDOWN;
     private float health = INITIAL_HEALTH;
 
-    private MoveBehavior moveBehavior;
+    private final MoveBehavior moveBehavior;
     private BulletObserver observer;
 
     public TankModel(MoveBehavior moveBehavior, float health) {
@@ -68,8 +68,8 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
 
     @Override
     public void setObserver(Observer observer) {
-        if (observer instanceof BulletObserver) {
-            this.observer = (BulletObserver) observer;
+        if (observer instanceof BulletObserver bulletObserver) {
+            this.observer = bulletObserver;
         } else {
             System.out.print("observer is not BulletObserver");
         }

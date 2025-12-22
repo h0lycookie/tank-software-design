@@ -2,6 +2,7 @@ package ru.mipt.bit.platformer.config;
 
 import java.util.List;
 import java.util.Map;
+
 import ru.mipt.bit.platformer.command.MoveTankCommand;
 import ru.mipt.bit.platformer.command.ShotCommand;
 import ru.mipt.bit.platformer.command.ToggleHealthBarCommand;
@@ -11,7 +12,7 @@ import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.ObjectType;
 
 public class Config {
-    private final int TREES_COUNT = 0;
+    private final int TREES_COUNT = 3;
     private final int AI_TANKS_COUNT = 3;
     private final float INITIAL_HEALTH = 90f;
     private final float TANK_MOVEMENT_SPEED = 0.4f;

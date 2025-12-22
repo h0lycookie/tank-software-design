@@ -3,6 +3,7 @@ package ru.mipt.bit.platformer.entity;
 import java.util.Set;
 
 import com.badlogic.gdx.math.GridPoint2;
+import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
@@ -11,18 +12,16 @@ import ru.mipt.bit.platformer.entity.interfaces.Observer;
 import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 
-import static com.badlogic.gdx.math.MathUtils.isEqual;
-
 public class BulletModel implements MovableEntity, CollidableEntity, ObservableEntity {
     private static final float MAX_MOVEMENT_PROGRESS = 1f;
     private static final float MIN_MOVEMENT_PROGRESS = 0f;
     private static final float BULLET_DAMAGE = 25f;
 
-    private GridPoint2 position;
+    private final GridPoint2 position;
     private GridPoint2 destinationPosition;
-    private float rotation;
-    private Direction direction;
-    private float movementSpeed;
+    private final float rotation;
+    private final Direction direction;
+    private final float movementSpeed;
     private float movementProgress = MAX_MOVEMENT_PROGRESS;
     private final MapState mapState; 
     private Observer observer;
@@ -103,17 +102,13 @@ public class BulletModel implements MovableEntity, CollidableEntity, ObservableE
     }
     
     public void destroy() {
-        System.out.println("destroy");
         if (observer != null) {
-            System.out.println("destroy1");
             observer.onObjectDiscarded(this);
         }
         mapState.removeEntity(this);
-        System.out.println("destroy2");
     }
 
     private void handleCollision(GridPoint2 position) {
-        // System.out.println("COLLISION COLLISION COLLISION\n");
         destroy();
         CollidableEntity conflictEntity = mapState.positionTakenBy(position);
         if (conflictEntity != null) {

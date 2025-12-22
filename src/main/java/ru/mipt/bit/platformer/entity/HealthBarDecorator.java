@@ -12,9 +12,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
-import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.HealthableEntity;
-import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.PositionableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 
@@ -24,7 +23,7 @@ public class HealthBarDecorator implements RenderableEntity {
     private static final int HEALTH_BAR_OFFSET_Y = 90;
     private static final int MAX_POSSIBLE_HEALTH = 100;
 
-    private RenderableEntity entity;
+    private final RenderableEntity entity;
 
     public HealthBarDecorator(RenderableEntity entity) {
         this.entity = entity;
@@ -63,7 +62,7 @@ public class HealthBarDecorator implements RenderableEntity {
     }
 
     @Override
-    public CollidableEntity getModel() {
+    public PositionableEntity getModel() {
         return entity.getModel();
     }
 
