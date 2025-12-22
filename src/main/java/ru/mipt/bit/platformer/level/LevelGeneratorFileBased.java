@@ -2,7 +2,7 @@ package ru.mipt.bit.platformer.level;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.util.ObstacleType;
+import ru.mipt.bit.platformer.util.ObjectType;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,19 +26,19 @@ public class LevelGeneratorFileBased implements LevelGenerator {
     }
 
     @Override
-    public Map<ObstacleType, Set<GridPoint2>> getUniqueObstaclesPositions() throws IOException {
-        Map<ObstacleType, Set<GridPoint2>> obstaclesPositions;
+    public Map<ObjectType, Set<GridPoint2>> getUniqueObjectsPositions() throws IOException {
+        Map<ObjectType, Set<GridPoint2>> objectsPositions;
         try {
-            obstaclesPositions = parseLevelMap();
+            objectsPositions = parseLevelMap();
         } catch (IOException e) {
             throw new RuntimeException("Failed to parse level Map \"" + filePath + "\"");
         }
 
-        return obstaclesPositions;
+        return objectsPositions;
     }
 
-    private Map<ObstacleType, Set<GridPoint2>> parseLevelMap() throws IOException {
-        Map<ObstacleType, Set<GridPoint2>> obstaclesPositions = new HashMap<>();
+    private Map<ObjectType, Set<GridPoint2>> parseLevelMap() throws IOException {
+        Map<ObjectType, Set<GridPoint2>> obstaclesPositions = new HashMap<>();
         List<String> fileLines = getfileLines(filePath);
 
         boolean foundPlayerPosition = false;
@@ -65,24 +65,24 @@ public class LevelGeneratorFileBased implements LevelGenerator {
         return lines;
     }
 
-    private boolean parseLine(String line, int rowCount, boolean foundPlayerPosition, Map<ObstacleType, Set<GridPoint2>> obstaclesPositions) {
+    private boolean parseLine(String line, int rowCount, boolean foundPlayerPosition, Map<ObjectType, Set<GridPoint2>> obstaclesPositions) {
         for (int x = 0; x < width; ++x) {
             char symbol = line.charAt(x);
             GridPoint2 position = new GridPoint2(x, (height - 1) - rowCount);
 
             switch (symbol) {
                 case 'T':
-                    putByObstacleType(ObstacleType.TREE, position, obstaclesPositions);
+                    putByObjectType(ObjectType.TREE, position, obstaclesPositions);
                     break;
                 case 'P':
                     if (foundPlayerPosition) {
                         throw new IllegalArgumentException("discovered multiple players positions");
                     }
                     foundPlayerPosition = true;
-                    putByObstacleType(ObstacleType.TANK, position, obstaclesPositions);
+                    putByObjectType(ObjectType.TANK, position, obstaclesPositions);
                     break;
                 case 'X':
-                    putByObstacleType(ObstacleType.TREE, position, obstaclesPositions);
+                    putByObjectType(ObjectType.TREE, position, obstaclesPositions);
                     break;
                 case '_':
                     break;
@@ -94,7 +94,7 @@ public class LevelGeneratorFileBased implements LevelGenerator {
         return foundPlayerPosition;
     }
 
-    private void putByObstacleType(ObstacleType type, GridPoint2 position, Map<ObstacleType, Set<GridPoint2>> obstaclesPositions) {
+    private void putByObjectType(ObjectType type, GridPoint2 position, Map<ObjectType, Set<GridPoint2>> obstaclesPositions) {
         Set<GridPoint2> obstaclePositionsByType = obstaclesPositions.get(type);
         if (obstaclePositionsByType == null) {
             obstaclePositionsByType = new HashSet<>();

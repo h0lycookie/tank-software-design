@@ -1,6 +1,6 @@
 package ru.mipt.bit.platformer.util;
 
-public enum ObstacleType {
+public enum ObjectType {
     TREE,
     TANK,
     BULLET

@@ -7,12 +7,13 @@ import ru.mipt.bit.platformer.command.ToggleHealthBarCommand;
 import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
 import ru.mipt.bit.platformer.util.ControlHandler;
 import ru.mipt.bit.platformer.util.Direction;
-import ru.mipt.bit.platformer.util.ObstacleType;
+import ru.mipt.bit.platformer.util.ObjectType;
 
 public class Config {
     private final int TREES_COUNT = 0;
     private final int AI_TANKS_COUNT = 3;
     private final float INITIAL_HEALTH = 90.f;
+    private final float MOVEMENT_SPEED = 0.4f;
 
     public ControlHandler getControlHandler(MovableEntity playerTank) {
         ControlHandler controlHandler = new ControlHandler();
@@ -36,14 +37,18 @@ public class Config {
         return controlHandler;
     }
 
-    public Map<ObstacleType, Integer> getObstaclesCount() {
+    public Map<ObjectType, Integer> getObstaclesCount() {
         return Map.of(
-            ObstacleType.TREE, TREES_COUNT,
-            ObstacleType.TANK, AI_TANKS_COUNT + 1   // plus player's tank
+            ObjectType.TREE, TREES_COUNT,
+            ObjectType.TANK, AI_TANKS_COUNT + 1   // plus player's tank
         );
     }
 
     public float getTankInitialHealth() {
         return INITIAL_HEALTH;
+    }
+
+    public float getMovementSpeed() {
+        return MOVEMENT_SPEED;
     }
 }
