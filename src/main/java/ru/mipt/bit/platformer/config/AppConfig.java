@@ -19,7 +19,7 @@ public class AppConfig {
     
     @Bean("aiTanksCount")
     public int aiTanksCount() {
-        return 3;
+        return 5;
     }
     
     @Bean("initialHealth")

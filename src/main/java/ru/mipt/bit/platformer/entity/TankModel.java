@@ -6,12 +6,11 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.MovableShootsEntity;
-import ru.mipt.bit.platformer.entity.interfaces.ObservableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.Observer;
 import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.ObjectType;
 
-public class TankModel implements MovableShootsEntity, CollidableEntity, ObservableEntity {
+public class TankModel implements MovableShootsEntity, CollidableEntity {
     private static final float INITIAL_COOLDOWN = 1.0f;
     private static final float BULLET_MOVEMENT_SPEED = 0.3f;
     private static final float INITIAL_HEALTH = 100f;
@@ -19,11 +18,14 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
     private float health = INITIAL_HEALTH;
 
     private final MoveBehavior moveBehavior;
-    private MortalObserver observer;
+    private final Observer tankObserver;
+    private final Observer bulletObserver;
 
-    public TankModel(MoveBehavior moveBehavior, float health) {
+    public TankModel(MoveBehavior moveBehavior, float health, Observer tankObserver, Observer bulletObserver) {
         this.moveBehavior = moveBehavior;
         this.health = health;
+        this.tankObserver = tankObserver;
+        this.bulletObserver = bulletObserver;
     }
 
     @Override
@@ -60,18 +62,16 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
                 : new GridPoint2(getPosition()).add(bulletDirection.getDirectionVector());
 
         MapState mapState = moveBehavior.getMapState();
-        BulletModel bullet = new BulletModel(bulletCoordinates, BULLET_MOVEMENT_SPEED, getRotation(), mapState);
-        bullet.setObserver(observer);
+        BulletModel bullet = new BulletModel(bulletCoordinates, BULLET_MOVEMENT_SPEED, getRotation(), bulletObserver, mapState);
         mapState.addObject(ObjectType.BULLET, bullet);
-        observer.onObjectRegistered(bullet);
+        bulletObserver.onObjectRegistered(bullet);
     }
 
     @Override
-    public void setObserver(Observer observer) {
-        if (observer instanceof MortalObserver mortalObserver) {
-            this.observer = mortalObserver;
-        } else {
-            System.err.print("observer is not mortalObserver");
+    public void onHit(float damage) {
+        health = Math.max(0, health - damage);
+        if (health <= 0) {
+            destroy();
         }
     }
 
@@ -93,21 +93,12 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
         return moveBehavior.getMovementProgress();
     }
 
-    public void receiveDamage(float damage) {;
-        health = Math.max(0, health - damage);
-        if (health <= 0) {
-            destroy();
-        }
-    }
-
     private void updateCooldown(float deltaTime) {
         cooldown -= deltaTime;
     }
 
     private void destroy() {
-        if (observer != null) {
-            observer.onObjectDiscarded(this);
-        }
+        tankObserver.onObjectDiscarded(this);
         moveBehavior.getMapState().removeEntity(this);
     }
 }

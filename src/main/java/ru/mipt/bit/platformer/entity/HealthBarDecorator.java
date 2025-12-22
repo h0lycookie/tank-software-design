@@ -1,8 +1,5 @@
 package ru.mipt.bit.platformer.entity;
 
-import java.util.Collections;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -49,16 +46,6 @@ public class HealthBarDecorator implements RenderableEntity {
     @Override
     public Rectangle getRectangle() {
         return entity.getRectangle();
-    }
-
-    @Override
-    public Set<GridPoint2> getCollisionPositions() {
-        return Collections.emptySet();
-    }
-
-    @Override
-    public void destroy() {
-        entity.destroy();
     }
 
     @Override

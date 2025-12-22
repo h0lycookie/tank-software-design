@@ -1,7 +1,5 @@
 package ru.mipt.bit.platformer.entity;
 
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
@@ -35,16 +33,7 @@ public class TreeGraphics implements RenderableEntity {
     }
 
     @Override
-    public Set<GridPoint2> getCollisionPositions() {
-        return Set.of(getPosition());
-    }
-
-    @Override
     public PositionableEntity getModel() {
         return treeModel;
-    }
-
-    @Override
-    public void destroy() {
     }
 }

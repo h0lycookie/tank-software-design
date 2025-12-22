@@ -1,7 +1,5 @@
 package ru.mipt.bit.platformer.entity;
 
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
@@ -32,11 +30,6 @@ public class BulletGraphics implements RenderableEntity {
     }
 
     @Override
-    public Set<GridPoint2> getCollisionPositions() {
-        return bulletModel.getCollisionPositions();
-    }
-
-    @Override
     public GridPoint2 getPosition() {
         return bulletModel.getPosition();
     }
@@ -46,7 +39,4 @@ public class BulletGraphics implements RenderableEntity {
         return bulletModel;
     }
 
-    @Override
-    public void destroy() {
-    }
 }

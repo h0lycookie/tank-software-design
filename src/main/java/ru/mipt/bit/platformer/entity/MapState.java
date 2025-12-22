@@ -56,12 +56,10 @@ public class MapState {
     }
 
     public void initGameObjects(Renderer renderer, Mover mover, TileMovement tileMovement) {
-        Observer observer = new MortalObserver(renderer, mover, tileMovement);
-
         Map<ObjectType, Set<GridPoint2>> objectsUniquePositions = getObjectsUniquePositions();
 
         initTrees(renderer, objectsUniquePositions);
-        initTanks(renderer, mover, tileMovement, objectsUniquePositions, observer);
+        initTanks(renderer, mover, tileMovement, objectsUniquePositions);
     }
     
     public boolean isPositionTaken(GridPoint2 position) {
@@ -153,13 +151,14 @@ public class MapState {
     }
 
     private void initTanks(Renderer renderer, Mover mover, TileMovement tileMovement, 
-                          Map<ObjectType, Set<GridPoint2>> objectsUniquePositions, Observer observer) {
+                          Map<ObjectType, Set<GridPoint2>> objectsUniquePositions) {
+        Observer tankObserver = new TankObserver(renderer, mover);
+        Observer bulletObserver = new BulletObserver(renderer, mover, tileMovement);
         List<TankModel> tanks = new ArrayList<>();
         for (GridPoint2 tankPosition: objectsUniquePositions.get(ObjectType.TANK)) {
             MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, 
                 gameConfig.getTankMovementSpeed(), 0f, this);
-            TankModel tankModel = new TankModel(tankMoveBehavior, gameConfig.getInitialHealth());
-            tankModel.setObserver(observer);
+            TankModel tankModel = new TankModel(tankMoveBehavior, gameConfig.getInitialHealth(), tankObserver, bulletObserver);
             tanks.add(tankModel);
             mover.addMovableEntity(tankModel);
             addObject(ObjectType.TANK, tankModel);

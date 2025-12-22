@@ -1,7 +1,5 @@
 package ru.mipt.bit.platformer.entity;
 
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
@@ -36,15 +34,7 @@ public class TankGraphics implements RenderableEntity {
     }
 
     @Override
-    public Set<GridPoint2> getCollisionPositions() {
-        return tankModel.getCollisionPositions();
-    }
-
-    @Override
     public PositionableEntity getModel() {
         return tankModel;
     }
-
-    @Override
-    public void destroy() {}
 }
