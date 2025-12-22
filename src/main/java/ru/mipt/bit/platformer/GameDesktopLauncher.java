@@ -71,35 +71,11 @@ public class GameDesktopLauncher implements ApplicationListener {
         initLevelStructures();
         initHandlingOnTick();
 
-        // Map<ObjectType, Set<GridPoint2>> obstaclesUniquePositions = getObjectsUniquePositions(config);
-
         MapState mapState = new MapState(layer.getWidth(), layer.getHeight(), config);
         mapState.initGameObjects(renderer, mover, tileMovement);
-        MovableEntity playerTank = mapState.getPlayerTank();
-        List<MovableEntity> aiTanks = mapState.getAITanks();
-        
-        // for (GridPoint2 treePosition: obstaclesUniquePositions.get(ObjectType.TREE)) {
-        //     RenderBehavior treeRenderBehavior = new RenderBehavior(new TextureRegion(new Texture("images/greenTree.png")));
-        //     TreeModel treeModel = new TreeModel(treePosition);
-        //     renderer.addRenderableEntity(new TreeGraphics(treeRenderBehavior, treeModel));
-        //     mapState.addObstacle(ObjectType.TREE, treeModel);
-        // }
 
-        // List<MovableEntity> tanks = new ArrayList<>();
-        // for (GridPoint2 tankPosition: obstaclesUniquePositions.get(ObjectType.TANK)) {
-        //     MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, mapState.getMovementSpeed(), 0f, mapState);
-        //     TankModel tankModel = new TankModel(tankMoveBehavior);
-        //     tanks.add(tankModel);
-        //     mover.addMovableEntity(tankModel);
-        //     mapState.addObstacle(ObjectType.TANK, tankModel);
-
-        //     MovingRenderBehavior tankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
-        //     TankGraphics tankGraphics = new TankGraphics(tankMovingRenderBehavior, tankModel);
-        //     renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(config.getTankInitialHealth())));
-        // }
-
-        controlHandler = config.getControlHandler(playerTank);
-        aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(aiTanks));
+        controlHandler = config.getControlHandler(mapState.getPlayerTank());
+        aiControlHandler = new AIControlHandler(MoveEntityCommandGenerator.create(mapState.getAITanks()));
     }
 
     @Override
