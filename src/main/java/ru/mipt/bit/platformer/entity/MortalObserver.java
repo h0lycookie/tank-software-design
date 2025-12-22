@@ -9,12 +9,12 @@ import ru.mipt.bit.platformer.field.Mover;
 import ru.mipt.bit.platformer.field.Renderer;
 import ru.mipt.bit.platformer.util.TileMovement;
 
-public class BulletObserver implements Observer {
+public class MortalObserver implements Observer {
     private final Renderer renderer;
     private final Mover mover;
     private final TileMovement tileMovement;
 
-    public BulletObserver(Renderer renderer, Mover mover, TileMovement tileMovement) {
+    public MortalObserver(Renderer renderer, Mover mover, TileMovement tileMovement) {
         this.renderer = renderer;
         this.mover = mover;
         this.tileMovement = tileMovement;
@@ -33,12 +33,17 @@ public class BulletObserver implements Observer {
 
     @Override
     public void onObjectDiscarded(Entity entity) {
-        if (entity instanceof BulletModel bulletModel) {
-            renderer.removeRenderableEntityByModel(bulletModel);
-            mover.removeMovableEntity(bulletModel);
-        } else if (entity instanceof TankModel tankModel) {
-            renderer.removeRenderableEntityByModel(tankModel);
-            mover.removeMovableEntity(tankModel);   
+        switch (entity) {
+            case BulletModel bulletModel -> {
+                renderer.removeRenderableEntityByModel(bulletModel);
+                mover.removeMovableEntity(bulletModel);
+            }
+            case TankModel tankModel -> {   
+                renderer.removeRenderableEntityByModel(tankModel);
+                mover.removeMovableEntity(tankModel);
+            }
+            default -> {
+            }
         }
     }
 }

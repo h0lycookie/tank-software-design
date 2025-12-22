@@ -19,7 +19,7 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
     private float health = INITIAL_HEALTH;
 
     private final MoveBehavior moveBehavior;
-    private BulletObserver observer;
+    private MortalObserver observer;
 
     public TankModel(MoveBehavior moveBehavior, float health) {
         this.moveBehavior = moveBehavior;
@@ -68,10 +68,10 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
 
     @Override
     public void setObserver(Observer observer) {
-        if (observer instanceof BulletObserver bulletObserver) {
-            this.observer = bulletObserver;
+        if (observer instanceof MortalObserver mortalObserver) {
+            this.observer = mortalObserver;
         } else {
-            System.out.print("observer is not BulletObserver");
+            System.err.print("observer is not mortalObserver");
         }
     }
 

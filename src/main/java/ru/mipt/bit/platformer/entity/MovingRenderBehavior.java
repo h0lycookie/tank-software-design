@@ -9,8 +9,8 @@ import ru.mipt.bit.platformer.util.GdxGameUtils;
 import ru.mipt.bit.platformer.util.TileMovement;
 
 public class MovingRenderBehavior {
-    private RenderBehavior renderBehavior;
-    private TileMovement tileMovement;
+    private final RenderBehavior renderBehavior;
+    private final TileMovement tileMovement;
 
     public MovingRenderBehavior(RenderBehavior renderBehavior, TileMovement tileMovement) {
         this.renderBehavior = renderBehavior;

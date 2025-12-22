@@ -11,8 +11,8 @@ import ru.mipt.bit.platformer.entity.interfaces.PositionableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 
 public class TankGraphics implements RenderableEntity {
-    private MovingRenderBehavior movingRenderBehavior;
-    private TankModel tankModel;
+    private final MovingRenderBehavior movingRenderBehavior;
+    private final TankModel tankModel;
 
     public TankGraphics(MovingRenderBehavior renderBehavior, TankModel tankModel) {
         this.movingRenderBehavior = renderBehavior;

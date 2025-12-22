@@ -1,10 +1,9 @@
 package ru.mipt.bit.platformer.entity;
 
-import static com.badlogic.gdx.math.MathUtils.isEqual;
-
 import java.util.Set;
 
 import com.badlogic.gdx.math.GridPoint2;
+import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
@@ -13,10 +12,10 @@ public class MoveBehavior {
     private static final float MAX_MOVEMENT_PROGRESS = 1f;
     private static final float MIN_MOVEMENT_PROGRESS = 0f;
 
-    private GridPoint2 position;
+    private final GridPoint2 position;
     private GridPoint2 destinationPosition;
     private float rotation;
-    private float movementSpeed;
+    private final float movementSpeed;
     private float movementProgress = MAX_MOVEMENT_PROGRESS;
     private final MapState mapState; 
 

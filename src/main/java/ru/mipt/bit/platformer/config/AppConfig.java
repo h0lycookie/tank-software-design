@@ -55,27 +55,4 @@ public class AppConfig {
             ObjectType.TANK, aiTanksCount() + 1   // plus player's tank
         );
     }
-    
-    // @Bean
-    // public ControlHandler controlHandler(MovableShootsEntity playerTank) {
-    //     ControlHandler controlHandler = new ControlHandler();
-
-    //     Map<Direction, List<Integer>> controls = Map.of(
-    //         Direction.UP, List.of(com.badlogic.gdx.Input.Keys.UP, com.badlogic.gdx.Input.Keys.W),
-    //         Direction.LEFT, List.of(com.badlogic.gdx.Input.Keys.LEFT, com.badlogic.gdx.Input.Keys.A),
-    //         Direction.DOWN, List.of(com.badlogic.gdx.Input.Keys.DOWN, com.badlogic.gdx.Input.Keys.S),
-    //         Direction.RIGHT, List.of(com.badlogic.gdx.Input.Keys.RIGHT, com.badlogic.gdx.Input.Keys.D)
-    //     );
-
-    //     controls.forEach((direction, keys) ->
-    //         controlHandler.addButtonAction(keys,
-    //                 new MoveTankCommand(playerTank, direction), true));
-
-    //     controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.L), 
-    //         new ToggleHealthBarCommand(), false);
-    //     controlHandler.addButtonAction(List.of(com.badlogic.gdx.Input.Keys.SPACE), 
-    //         new ShotCommand(playerTank), false);
-        
-    //     return controlHandler;
-    // }
 }

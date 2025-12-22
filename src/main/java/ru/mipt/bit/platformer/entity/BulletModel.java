@@ -43,7 +43,7 @@ public class BulletModel implements MovableEntity, CollidableEntity, ObservableE
             prepareMovement(direction);
         }
     }   
-    
+     
     @Override
     public void prepareMovement(Direction direction) {
         if (finishedMoving()) {
