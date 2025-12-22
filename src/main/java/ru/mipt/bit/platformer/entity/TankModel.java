@@ -13,13 +13,17 @@ import ru.mipt.bit.platformer.util.ObjectType;
 
 public class TankModel implements MovableShootsEntity, CollidableEntity, ObservableEntity {
     private static final float INITIAL_COOLDOWN = 1.0f;
+    private static final float BULLET_MOVEMENT_SPEED = 0.3f;
+    private static final float INITIAL_HEALTH = 100f;
     private float cooldown = INITIAL_COOLDOWN;
+    private float health = INITIAL_HEALTH;
 
     private MoveBehavior moveBehavior;
     private BulletObserver observer;
 
-    public TankModel(MoveBehavior moveBehavior) {
+    public TankModel(MoveBehavior moveBehavior, float health) {
         this.moveBehavior = moveBehavior;
+        this.health = health;
     }
 
     @Override
@@ -56,7 +60,8 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
                 : new GridPoint2(getPosition()).add(bulletDirection.getDirectionVector());
 
         MapState mapState = moveBehavior.getMapState();
-        BulletModel bullet = new BulletModel(bulletCoordinates, 0.8f, getRotation(), mapState);
+        BulletModel bullet = new BulletModel(bulletCoordinates, BULLET_MOVEMENT_SPEED, getRotation(), mapState);
+        bullet.setObserver(observer);
         mapState.addObject(ObjectType.BULLET, bullet);
         observer.onObjectRegistered(bullet);
     }
@@ -68,6 +73,11 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
         } else {
             System.out.print("observer is not BulletObserver");
         }
+    }
+
+    @Override
+    public float getHealth() {
+        return health;
     }
 
 
@@ -83,11 +93,16 @@ public class TankModel implements MovableShootsEntity, CollidableEntity, Observa
         return moveBehavior.getMovementProgress();
     }
 
+    public void receiveDamage(float damage) {;
+        health = Math.max(0, health - damage);
+        if (health <= 0) {
+            destroy();
+        }
+    }
+
     private void updateCooldown(float deltaTime) {
         cooldown -= deltaTime;
     }
-
-    // private 
 
     private void destroy() {
         if (observer != null) {

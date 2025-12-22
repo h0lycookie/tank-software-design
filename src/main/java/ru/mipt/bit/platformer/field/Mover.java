@@ -24,7 +24,7 @@ public class Mover implements RemovableFrom {
     }
 
     public void moveEntities(float deltaTime) {
-        for (MovableEntity entity: movableEntities) {
+        for (MovableEntity entity: Set.copyOf(movableEntities)) {
             entity.move(deltaTime);
         }
     }

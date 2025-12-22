@@ -12,10 +12,10 @@ import ru.mipt.bit.platformer.util.ObjectType;
 
 public class Config {
     private final int TREES_COUNT = 0;
-    private final int AI_TANKS_COUNT = 0;
-    private final float INITIAL_HEALTH = 90.f;
+    private final int AI_TANKS_COUNT = 3;
+    private final float INITIAL_HEALTH = 90f;
     private final float TANK_MOVEMENT_SPEED = 0.4f;
-    private final float BULLET_MOVEMENT_SPEED = 0.8f;
+    private final float BULLET_MOVEMENT_SPEED = 0.3f;
 
     public ControlHandler getControlHandler(MovableShootsEntity playerTank) {
         ControlHandler controlHandler = new ControlHandler();

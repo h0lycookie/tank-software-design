@@ -12,6 +12,9 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
+import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.HealthableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 
@@ -22,17 +25,15 @@ public class HealthBarDecorator implements RenderableEntity {
     private static final int MAX_POSSIBLE_HEALTH = 100;
 
     private RenderableEntity entity;
-    private final HealthBarModel healthBarModel;
 
-    public HealthBarDecorator(RenderableEntity entity, HealthBarModel healthBarModel) {
+    public HealthBarDecorator(RenderableEntity entity) {
         this.entity = entity;
-        this.healthBarModel = healthBarModel;
     }
 
     @Override
     public void render(Batch batch, TiledMapTileLayer layer) {
         if (HealthBarsState.getInstance().isVisible()) {
-            float relativeHealth = healthBarModel.getHealth() / MAX_POSSIBLE_HEALTH;
+            float relativeHealth = getHealth() / MAX_POSSIBLE_HEALTH;
             TextureRegion healthBarTexture = createHealthBarTexture(relativeHealth);
             Rectangle healthBarRectangle = createHealthBarRectangle();
             GdxGameUtils.drawTextureRegionUnscaled(batch, healthBarTexture, healthBarRectangle, 0f);
@@ -61,12 +62,13 @@ public class HealthBarDecorator implements RenderableEntity {
         entity.destroy();
     }
 
-    public void damage(float damage) {
-
+    @Override
+    public CollidableEntity getModel() {
+        return entity.getModel();
     }
 
-    public float getHealth() {
-        return healthBarModel.getHealth();
+    private float getHealth() {
+        return (entity.getModel() instanceof HealthableEntity) ? ((HealthableEntity) entity.getModel()).getHealth() : 0;
     }
 
     private TextureRegion createHealthBarTexture(float relativeHealth) {

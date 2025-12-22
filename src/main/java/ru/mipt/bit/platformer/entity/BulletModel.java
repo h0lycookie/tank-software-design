@@ -16,7 +16,7 @@ import static com.badlogic.gdx.math.MathUtils.isEqual;
 public class BulletModel implements MovableEntity, CollidableEntity, ObservableEntity {
     private static final float MAX_MOVEMENT_PROGRESS = 1f;
     private static final float MIN_MOVEMENT_PROGRESS = 0f;
-    private static final float BULLET_DAMAGE = 25;
+    private static final float BULLET_DAMAGE = 25f;
 
     private GridPoint2 position;
     private GridPoint2 destinationPosition;
@@ -35,7 +35,6 @@ public class BulletModel implements MovableEntity, CollidableEntity, ObservableE
         this.movementSpeed = movementSpeed;
         this.mapState = mapState;
     }
-
 
     @Override
     public void move(float deltaTime) {
@@ -104,21 +103,31 @@ public class BulletModel implements MovableEntity, CollidableEntity, ObservableE
     }
     
     public void destroy() {
+        System.out.println("destroy");
         if (observer != null) {
+            System.out.println("destroy1");
             observer.onObjectDiscarded(this);
         }
         mapState.removeEntity(this);
+        System.out.println("destroy2");
     }
 
     private void handleCollision(GridPoint2 position) {
+        // System.out.println("COLLISION COLLISION COLLISION\n");
         destroy();
         CollidableEntity conflictEntity = mapState.positionTakenBy(position);
         if (conflictEntity != null) {
             if (conflictEntity instanceof BulletModel) {
                 ((BulletModel) conflictEntity).destroy();
-            } else if (conflictEntity instanceof HealthBarDecorator) {
-                ((HealthBarDecorator) conflictEntity).damage(BULLET_DAMAGE);
+            } else if (conflictEntity instanceof TankModel) {
+                ((TankModel) conflictEntity).receiveDamage(BULLET_DAMAGE);
             }
         }
+    }
+
+
+    @Override
+    public float getHealth() {
+        return 1;   // minimal hp
     }
 }

@@ -7,6 +7,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
+import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 
 public class TreeGraphics implements RenderableEntity {
@@ -36,6 +38,11 @@ public class TreeGraphics implements RenderableEntity {
     @Override
     public Set<GridPoint2> getCollisionPositions() {
         return Set.of(getPosition());
+    }
+
+    @Override
+    public CollidableEntity getModel() {
+        return treeModel;
     }
 
     @Override

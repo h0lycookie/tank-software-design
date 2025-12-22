@@ -141,7 +141,7 @@ public class MapState implements RemovableFrom {
         List<TankModel> tanks = new ArrayList<>();
         for (GridPoint2 tankPosition: objectsUniquePositions.get(ObjectType.TANK)) {
             MoveBehavior tankMoveBehavior = new MoveBehavior(tankPosition, config.getTankMovementSpeed(), 0f, this);
-            TankModel tankModel = new TankModel(tankMoveBehavior);
+            TankModel tankModel = new TankModel(tankMoveBehavior, 100.f);
             tankModel.setObserver(observer);
             tanks.add(tankModel);
             mover.addMovableEntity(tankModel);
@@ -149,7 +149,7 @@ public class MapState implements RemovableFrom {
 
             MovingRenderBehavior tankMovingRenderBehavior = new MovingRenderBehavior(new RenderBehavior(new TextureRegion(new Texture("images/tank_blue.png"))), tileMovement);
             TankGraphics tankGraphics = new TankGraphics(tankMovingRenderBehavior, tankModel);
-            renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics, new HealthBarModel(config.getTankInitialHealth())));
+            renderer.addRenderableEntity(new HealthBarDecorator(tankGraphics));
         }
 
         playerTank = tanks.get(0);
