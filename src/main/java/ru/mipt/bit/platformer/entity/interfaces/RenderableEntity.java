@@ -11,3 +11,4 @@ public interface RenderableEntity extends PositionableEntity {
 
     public PositionableEntity getModel();
 };
+
