@@ -14,7 +14,7 @@ public class AIControlHandler {
 
     public void handle() {
         for (var commandsForAI : commands) {
-            int action = ThreadLocalRandom.current().nextInt(commands.size());
+            int action = ThreadLocalRandom.current().nextInt(commandsForAI.size());
             var command = commandsForAI.get(action);
             command.execute();
         }

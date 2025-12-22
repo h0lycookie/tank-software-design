@@ -1,48 +1,55 @@
 package ru.mipt.bit.platformer.level;
 
+import ru.mipt.bit.platformer.util.ObjectType;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+
 import com.badlogic.gdx.math.GridPoint2;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+public class LevelGeneratorRandom implements LevelGenerator {
+    private final int width;
+    private final int height;
+    private final Map<ObjectType, Integer> obstaclesCounts;
 
-public class LevelGeneratorRandom extends LevelGenerator {
-    private final Random rng;
-    private final int treeCount;
-    private final int aiTanksCount;
-
-    public LevelGeneratorRandom(int width, int height, int treeCount, int aiTanksCount) {
-        super(width, height);
-        this.rng = new Random();
-        this.treeCount = treeCount;
-        this.aiTanksCount = aiTanksCount;
+    public LevelGeneratorRandom(int width, int height, Map<ObjectType, Integer> obstaclesCounts) {
+        this.width = width;
+        this.height = height;
+        this.obstaclesCounts = obstaclesCounts;
     }
 
-    public LevelData generateLevel() {
-        List<GridPoint2> treePositions = new ArrayList<>();
-        List<GridPoint2> tankPositions = new ArrayList<>(aiTanksCount + 1);
+    @Override
+    public Map<ObjectType, Set<GridPoint2>> getUniqueObjectsPositions() throws IOException {
+        return generateUniqueObjectsPositions();
+    }
 
-        for (int i = 0; i < treeCount; ++i) {
-            GridPoint2 position;
-            do {
-                position = new GridPoint2(rng.nextInt(width), rng.nextInt(height));
-            } while (treePositions.contains(position));
-            treePositions.add(position);
-        }
+    private Map<ObjectType, Set<GridPoint2>> generateUniqueObjectsPositions() {
+        Map<ObjectType, Set<GridPoint2>> objectsPositionsByType = new HashMap<>();
+        Set<GridPoint2> objectsUniquePositions = new HashSet<>();
 
-        for (int i = 0; i < aiTanksCount + 1; ++i) {
-            GridPoint2 position;
-            do {
-                position = new GridPoint2(rng.nextInt(width), rng.nextInt(height));
-            } while (tankPositions.contains(position) || treePositions.contains(position));
-            tankPositions.add(position);
-        }
+        obstaclesCounts.forEach((objectType, obstaclesCountOfType) -> {
+            Set<GridPoint2> objectsPositionsOfCurrentType = new HashSet<>();
+            objectsPositionsByType.put(objectType, objectsPositionsOfCurrentType);
 
-        // do {
-        //     playerPosition = new GridPoint2(rng.nextInt(width), rng.nextInt(height));
-        // } while (treePositions.contains(playerPosition) || aiTanksPositions.contains(playerPosition));
+            for (int i = 0; i < obstaclesCountOfType; ++i) {
+                GridPoint2 position;
+                do {
+                    position = generateCoordinates();
+                }
+                while (objectsUniquePositions.contains(position));
+                objectsUniquePositions.add(position);
+                objectsPositionsOfCurrentType.add(position);
+            }
+        });
 
-        // return new LevelData(playerPosition, treePositions, aiTanksPositions);
-        return new LevelData(treePositions, tankPositions);
+        return objectsPositionsByType;
+    }
+
+    private GridPoint2 generateCoordinates() {
+        return new GridPoint2(ThreadLocalRandom.current().nextInt(width), ThreadLocalRandom.current().nextInt(height));
     }
 }

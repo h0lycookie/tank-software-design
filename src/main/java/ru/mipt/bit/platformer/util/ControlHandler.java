@@ -10,10 +10,10 @@ import com.badlogic.gdx.Input;
 import ru.mipt.bit.platformer.entity.interfaces.Command;
 
 public class ControlHandler {
-    private final Collection<ButtonAction> buttonActions;
-
+    List<ButtonAction> buttonActions;
+    
     public ControlHandler() {
-        this.buttonActions = new ArrayList<>();
+        buttonActions = new ArrayList<>();
     }
 
     public void addButtonAction(Collection<Integer> buttons, Command command, boolean toggleOnEveryRender) {
@@ -23,15 +23,15 @@ public class ControlHandler {
     public void handle(Input input) {
         for (ButtonAction buttonAction : buttonActions) {
             if (buttonAction.isToggleOnEveryRender()) {
-                executeCommand(buttonAction, input::isKeyPressed);
+                executeCommandOnPredicate(buttonAction, input::isKeyPressed);
             } else {
-                executeCommand(buttonAction, input::isKeyJustPressed);
+                executeCommandOnPredicate(buttonAction, input::isKeyJustPressed);
             }
         }
     }
 
-    private void executeCommand(ButtonAction buttonAction, Predicate<Integer> keyPressPredicate) {
-        if (buttonAction.getButtons().stream().anyMatch(keyPressPredicate)) {
+    private void executeCommandOnPredicate(ButtonAction buttonAction, Predicate<Integer> predicate) {
+        if (buttonAction.getButtons().stream().anyMatch(predicate)) {
             buttonAction.getCommand().execute();
         }
     }
@@ -42,7 +42,7 @@ public class ControlHandler {
         private final boolean toggleOnEveryRender;
 
         public ButtonAction(Collection<Integer> buttons, Command command, boolean toggleOnEveryRender) {
-            this.buttons = List.copyOf(buttons);
+            this.buttons = buttons;
             this.command = command;
             this.toggleOnEveryRender = toggleOnEveryRender;
         }

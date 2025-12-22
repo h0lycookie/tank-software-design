@@ -1,10 +1,12 @@
 package ru.mipt.bit.platformer.entity;
 
-import ru.mipt.bit.platformer.entity.interfaces.Entity;
+import java.util.Set;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-public class TreeModel implements Entity {
+import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
+
+public class TreeModel implements CollidableEntity {
     GridPoint2 position;
 
     public TreeModel(GridPoint2 position) {
@@ -15,4 +17,12 @@ public class TreeModel implements Entity {
     public GridPoint2 getPosition() {
         return position;
     }
+
+    @Override
+    public Set<GridPoint2> getCollisionPositions() {
+        return Set.of(position);
+    }
+
+    @Override
+    public void onHit(float damage) {}
 }

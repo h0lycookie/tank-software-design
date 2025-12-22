@@ -4,15 +4,14 @@ import ru.mipt.bit.platformer.entity.interfaces.Command;
 import ru.mipt.bit.platformer.entity.interfaces.Shoots;
 
 public class ShotCommand implements Command {
+    private final Shoots shooter;
 
-    private final Shoots model;
-
-    public ShotCommand(Shoots model) {
-        this.model = model;
+    public ShotCommand(Shoots shooter) {
+        this.shooter = shooter;
     }
 
     @Override
     public void execute() {
-        model.shoot();
+        shooter.shoot();
     }
 }

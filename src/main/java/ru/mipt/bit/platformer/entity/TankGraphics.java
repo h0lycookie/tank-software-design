@@ -3,12 +3,14 @@ package ru.mipt.bit.platformer.entity;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
 
+import ru.mipt.bit.platformer.entity.interfaces.PositionableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
 
 public class TankGraphics implements RenderableEntity {
-    private MovingRenderBehavior movingRenderBehavior;
-    private TankModel tankModel;
+    private final MovingRenderBehavior movingRenderBehavior;
+    private final TankModel tankModel;
 
     public TankGraphics(MovingRenderBehavior renderBehavior, TankModel tankModel) {
         this.movingRenderBehavior = renderBehavior;
@@ -24,5 +26,15 @@ public class TankGraphics implements RenderableEntity {
     @Override
     public GridPoint2 getPosition() {
         return tankModel.getPosition();
+    }
+
+    @Override
+    public Rectangle getRectangle() {
+        return movingRenderBehavior.getRectangle();
+    }
+
+    @Override
+    public PositionableEntity getModel() {
+        return tankModel;
     }
 }

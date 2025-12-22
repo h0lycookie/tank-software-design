@@ -9,42 +9,52 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
-import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.HealthableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.PositionableEntity;
 import ru.mipt.bit.platformer.entity.interfaces.RenderableEntity;
-import ru.mipt.bit.platformer.field.Renderer;
-import ru.mipt.bit.platformer.util.Direction;
 import ru.mipt.bit.platformer.util.GdxGameUtils;
 
 public class HealthBarDecorator implements RenderableEntity {
-
     private static final int HEALTH_BAR_WIDTH = 70;
     private static final int HEALTH_BAR_HEIGHT = 16;
     private static final int HEALTH_BAR_OFFSET_Y = 90;
+    private static final int MAX_POSSIBLE_HEALTH = 100;
 
-    private RenderableEntity entity;
-    private final HealthBarModel healthBarModel;
-    private GridPoint2 position;
+    private final RenderableEntity entity;
 
-    public HealthBarDecorator(RenderableEntity entity, HealthBarModel healthBarModel) {
+    public HealthBarDecorator(RenderableEntity entity) {
         this.entity = entity;
-        this.healthBarModel = healthBarModel;
     }
 
     @Override
     public void render(Batch batch, TiledMapTileLayer layer) {
-        if (!healthBarModel.getVisible()) {
-            return;
+        if (HealthBarsState.getInstance().isVisible()) {
+            float relativeHealth = getHealth() / MAX_POSSIBLE_HEALTH;
+            TextureRegion healthBarTexture = createHealthBarTexture(relativeHealth);
+            Rectangle healthBarRectangle = createHealthBarRectangle();
+            GdxGameUtils.drawTextureRegionUnscaled(batch, healthBarTexture, healthBarRectangle, 0f);
         }
 
-        float relativeHealth = healthBarModel.getHealth() / 100;
-        TextureRegion healthBarTexture = createHealthBarTexture(relativeHealth);
-        Rectangle healthBarRectangle = createHealthBarRectangle();
-        GdxGameUtils.drawTextureRegionUnscaled(batch, healthBarTexture, healthBarRectangle, 0f);
+        entity.render(batch, layer);
     }
 
     @Override
     public GridPoint2 getPosition() {
-        return position;
+        return entity.getPosition().add(0, HEALTH_BAR_OFFSET_Y);
+    }
+
+    @Override
+    public Rectangle getRectangle() {
+        return entity.getRectangle();
+    }
+
+    @Override
+    public PositionableEntity getModel() {
+        return entity.getModel();
+    }
+
+    private float getHealth() {
+        return (entity.getModel() instanceof HealthableEntity) ? ((HealthableEntity) entity.getModel()).getHealth() : 0;
     }
 
     private TextureRegion createHealthBarTexture(float relativeHealth) {
@@ -61,8 +71,6 @@ public class HealthBarDecorator implements RenderableEntity {
     private Rectangle createHealthBarRectangle() {
         Rectangle rectangle = new Rectangle(entity.getRectangle());
         rectangle.y += HEALTH_BAR_OFFSET_Y;
-        position.x = (int) rectangle.x;
-        position.y = (int) rectangle.y;
         return rectangle;
     }
 }

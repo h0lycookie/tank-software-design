@@ -1,27 +1,36 @@
 package ru.mipt.bit.platformer.entity;
 
+import java.util.Set;
+
 import com.badlogic.gdx.math.GridPoint2;
 
-import ru.mipt.bit.platformer.entity.interfaces.HealthableEntity;
-import ru.mipt.bit.platformer.entity.interfaces.MovableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.CollidableEntity;
+import ru.mipt.bit.platformer.entity.interfaces.MovableShootsEntity;
 import ru.mipt.bit.platformer.entity.interfaces.Observer;
-import ru.mipt.bit.platformer.entity.interfaces.Shoots;
 import ru.mipt.bit.platformer.util.Direction;
+import ru.mipt.bit.platformer.util.ObjectType;
 
-public class TankModel implements MovableEntity, HealthableEntity, Shoots {
+public class TankModel implements MovableShootsEntity, CollidableEntity {
     private static final float INITIAL_COOLDOWN = 1.0f;
+    private static final float BULLET_MOVEMENT_SPEED = 0.3f;
+    private static final float INITIAL_HEALTH = 100f;
+    private float cooldown = INITIAL_COOLDOWN;
+    private float health = INITIAL_HEALTH;
 
-    private MoveBehavior moveBehavior;
-    private float health;
-    private float cooldown;
-    private Observer observer;
+    private final MoveBehavior moveBehavior;
+    private final Observer tankObserver;
+    private final Observer bulletObserver;
 
-    public TankModel(MoveBehavior moveBehavior) {
+    public TankModel(MoveBehavior moveBehavior, float health, Observer tankObserver, Observer bulletObserver) {
         this.moveBehavior = moveBehavior;
+        this.health = health;
+        this.tankObserver = tankObserver;
+        this.bulletObserver = bulletObserver;
     }
 
     @Override
     public void move(float deltaTime) {
+        updateCooldown(deltaTime);
         moveBehavior.move(deltaTime);
     }
 
@@ -36,46 +45,60 @@ public class TankModel implements MovableEntity, HealthableEntity, Shoots {
     }
 
     @Override
-    public float getHealth() {
-        return health;
+    public Set<GridPoint2> getCollisionPositions() {
+        return moveBehavior.getCollisionPositions();
     }
 
     @Override
     public void shoot() {
-        if (cooldown > 0) return;
+        if (cooldown > 0) {
+            return;
+        }
 
         cooldown = INITIAL_COOLDOWN;
-        Direction bulletDirection = Direction.getDirection(moveBehavior.getRotation());
-        GridPoint2 bulletCoordinates = (moveBehavior.getMovementProgress() < 1f)
-                ? new GridPoint2(moveBehavior.getDestinationPosition())
-                : new GridPoint2(moveBehavior.getPosition()).add(bulletDirection.getDirectionVector());
+        Direction bulletDirection = Direction.getDirection(getRotation());
+        GridPoint2 bulletCoordinates = moveBehavior.isMoving()
+                ? new GridPoint2(getDestinationPosition())
+                : new GridPoint2(getPosition()).add(bulletDirection.getDirectionVector());
 
-        BulletModel bullet = new BulletModel(bulletCoordinates, bulletDirection, map);
-        map.addBullet(bullet);
-        observer.objectAppeared(bullet, "bullet");
+        MapState mapState = moveBehavior.getMapState();
+        BulletModel bullet = new BulletModel(bulletCoordinates, BULLET_MOVEMENT_SPEED, getRotation(), bulletObserver, mapState);
+        mapState.addObject(ObjectType.BULLET, bullet);
+        bulletObserver.onObjectRegistered(bullet);
     }
+
+    @Override
+    public void onHit(float damage) {
+        health = Math.max(0, health - damage);
+        if (health <= 0) {
+            destroy();
+        }
+    }
+
+    @Override
+    public float getHealth() {
+        return health;
+    }
+
 
     public GridPoint2 getDestinationPosition() {
         return moveBehavior.getDestinationPosition();
     }
 
     public float getRotation() {
-        return moveBehavior.getRotation();
+    return moveBehavior.getRotation();
     }
 
     public float getMovementProgress() {
         return moveBehavior.getMovementProgress();
     }
 
-    public void hit(int damage) {
-        health = Math.max(0, health - damage);
-        if (health <= 0) destroy();
+    private void updateCooldown(float deltaTime) {
+        cooldown -= deltaTime;
     }
 
     private void destroy() {
-        if (observer != null) {
-            observer.objectDestroyed(this, "tank");
-        }
-        map.removeTank(this);
+        tankObserver.onObjectDiscarded(this);
+        moveBehavior.getMapState().removeEntity(this);
     }
 }

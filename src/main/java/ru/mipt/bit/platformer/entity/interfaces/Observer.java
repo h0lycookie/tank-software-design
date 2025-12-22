@@ -1,6 +1,6 @@
 package ru.mipt.bit.platformer.entity.interfaces;
 
 public interface Observer {
-    void objectAppeared(MovableEntity model, String name);
-    void objectDestroyed(MovableEntity model, String name);
+    public void onObjectRegistered(Entity entity);
+    public void onObjectDiscarded(Entity entity);
 }
